@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ポケふた スタンプラリー管理</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- ポケふたマスターデータ -->
+  <script src="data.js"></script>
+
+  <style>
+    :root {
+      --primary: #FF6B00;
+      --primary-gradient: linear-gradient(135deg, #FF8A00 0%, #FF5100 100%);
+      --blue: #0284C7;
+      --blue-gradient: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+      --gray: #64748B;
+      --gray-gradient: linear-gradient(135deg, #94A3B8 0%, #64748B 100%);
+      --bg-dark: #0F172A;
+      --surface: rgba(255, 255, 255, 0.96);
+      --surface-glass: rgba(255, 255, 255, 0.88);
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+      --shadow-lg: 0 16px 36px rgba(0,0,0,0.18);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+      color: var(--text-main);
+      background-color: #F8FAFC;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* アプリヘッダー */
+    header {
+      background: var(--surface-glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 4px 10px rgba(255, 107, 0, 0.35);
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 3px 10px rgba(255, 107, 0, 0.28);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.94;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #F1F5F9;
+    }
+
+    .btn-danger {
+      background: #EF4444;
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 0.78rem;
+    }
+
+    /* 統計＆フィルターバー */
+    .top-panel {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    .stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .progress-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      height: 8px;
+      background: #E2E8F0;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary-gradient);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #F1F5F9;
+      color: var(--text-muted);
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+    }
+
+    .sync-dot.offline {
+      background: #94A3B8;
+    }
+
+    /* フィルタータブ */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #F8FAFC;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--text-main);
+      color: white;
+      border-color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    }
+
+    .filter-btn .badge-count {
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-btn.active .badge-count {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .filter-btn.filter-orange.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .filter-btn.filter-blue.active {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .filter-btn.filter-gray.active {
+      background: var(--gray);
+      border-color: var(--gray);
+    }
+
+    /* マップエリア */
+    #map-container {
+      flex: 1;
+      width: 100%;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* カスタムピンアイコン */
+    .custom-marker-pin {
+      width: 36px;
+      height: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform-origin: bottom center;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+    }
+
+    .custom-marker-pin:hover {
+      transform: scale(1.15) translateY(-4px);
+      z-index: 9999 !important;
+    }
+
+    .pin-body {
+      width: 36px;
+      height: 36px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      border: 2px solid #FFFFFF;
+    }
+
+    .pin-content {
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .pin-orange .pin-body {
+      background: var(--primary-gradient);
+    }
+
+    .pin-blue .pin-body {
+      background: var(--blue-gradient);
+    }
+
+    .pin-gray .pin-body {
+      background: var(--gray-gradient);
+    }
+
+    /* ポップアップカスタマイズ */
+    .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+      line-height: 1.5;
+      min-width: 275px;
+      max-width: 325px;
+    }
+
+    /* ツールチップ（カーソルホバー時）カスタマイズ */
+    .custom-tooltip {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    .tooltip-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tooltip-region {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tooltip-address {
+      font-size: 0.78rem;
+      color: var(--text-main);
+      font-weight: 500;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .tooltip-name {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .popup-card {
+      padding: 16px;
+    }
+
+    .popup-header {
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .popup-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .popup-badge.badge-orange {
+      background: #FFF7ED;
+      color: #EA580C;
+    }
+
+    .popup-badge.badge-blue {
+      background: #F0F9FF;
+      color: #0284C7;
+    }
+
+    .popup-badge.badge-gray {
+      background: #F1F5F9;
+      color: #64748B;
+    }
+
+    /* prefecture & city を最優先・目立つ表示に */
+    .popup-region-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0F172A;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .popup-region-title svg {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* address 欄 */
+    .popup-address-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      margin: 8px 0;
+      font-size: 0.78rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .popup-address-label {
+      font-weight: 700;
+      color: var(--primary);
+      white-space: nowrap;
+      font-size: 0.75rem;
+    }
+
+    .popup-address-text {
+      color: var(--text-main);
+      word-break: break-all;
+    }
+
+    /* name (ポケモン名) はサブ要素として控えめに表示 */
+    .popup-pokemon-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .popup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      background: #FFFFFF;
+      color: var(--text-main);
+      outline: none;
+      font-family: inherit;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
+    }
+
+    .popup-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-official {
+      background: #F8FAFC;
+      color: #334155;
+      border: 1px solid var(--border);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .btn-official:hover {
+      background: #F1F5F9;
+      color: #0F172A;
+    }
+
+    /* モーダル全般（ログイン・フレンド管理） */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 440px;
+      padding: 24px;
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+    }
+
+    .modal-close:hover {
+      color: var(--text-main);
+      background: #F1F5F9;
+    }
+
+    /* フレンド管理リスト */
+    .friend-form-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .friend-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .friend-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 14px;
+      background: #F8FAFC;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+    }
+
+    .friend-item:hover {
+      background: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .friend-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .friend-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .friend-code-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.76rem;
+      background: #E2E8F0;
+      color: #334155;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      width: fit-content;
+    }
+
+    .friend-code-badge:hover {
+      background: #CBD5E1;
+      color: #0F172A;
+    }
+
+    .friend-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.03);
+      padding: 5px 8px;
+      border-radius: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+
+    /* ログイン画面特化スタイル */
+    .login-container {
+      text-align: center;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(255, 107, 0, 0.35);
+    }
+
+    .login-error {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #EF4444;
+      font-weight: 600;
+      display: none;
+    }
+
+    /* シェイクアニメーション（パスワード誤入力時） */
+    .shake {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+      40%, 60% { transform: translate3d(6px, 0, 0); }
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 640px) {
+      header {
+        padding: 8px 12px;
+      }
+      .brand-title {
+        font-size: 0.95rem;
+      }
+      .btn {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+      }
+      .top-panel {
+        padding: 6px 12px;
+      }
+      .leaflet-popup-content {
+        min-width: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- アプリヘッダー -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">ポケふたラリー</div>
+        <div class="brand-sub">ポケモンマンホール管理</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-open-friends">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>フレンド管理</span>
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-logout" title="合言葉の再設定・ログアウト">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- 統計＆フィルターバー -->
+  <div class="top-panel">
+    <div class="stats-row">
+      <div class="progress-box">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">獲得: 0 / 0 (0%)</div>
+      </div>
+      <div class="sync-status" id="sync-indicator">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-text">同期準備中</span>
+      </div>
+    </div>
+
+    <!-- 絞り込みタブ -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">
+        <span>すべて</span>
+        <span class="badge-count" id="count-all">0</span>
+      </button>
+      <button class="filter-btn filter-orange" data-filter="acquired">
+        <span>自分で獲得</span>
+        <span class="badge-count" id="count-acquired">0</span>
+      </button>
+      <button class="filter-btn filter-blue" data-filter="received">
+        <span>もらった</span>
+        <span class="badge-count" id="count-received">0</span>
+      </button>
+      <button class="filter-btn filter-gray" data-filter="unacquired">
+        <span>未所持</span>
+        <span class="badge-count" id="count-unacquired">0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 地図コンテナ -->
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- 簡易ログインモーダル -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card login-container" id="login-card">
+      <div class="login-logo">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+        </svg>
+      </div>
+      <h2 class="modal-title" style="margin-bottom: 6px;">ポケふたラリー</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">合言葉を入力してログインしてください</p>
+      
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <input type="password" id="password-input" class="form-input" placeholder="合言葉（パスワード）" autocomplete="current-password" required style="text-align: center; font-size: 1rem; padding: 10px;">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem;">
+          入場する
+        </button>
+        <div class="login-error" id="login-error">合言葉が正しくありません</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- フレンド管理モーダル -->
+  <div class="modal-overlay" id="friend-modal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">フレンドリスト管理</h3>
+        <button class="modal-close" id="btn-close-friends">&times;</button>
+      </div>
+
+      <!-- フレンド新規追加フォーム -->
+      <div class="friend-form-card">
+        <div class="form-group">
+          <label class="form-label" for="new-friend-name">フレンド名（必須）</label>
+          <input type="text" id="new-friend-name" class="form-input" placeholder="例: サトシ" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-friend-code">トレーナーコード（任意）</label>
+          <input type="text" id="new-friend-code" class="form-input" placeholder="例: 1234 5678 9012" maxlength="24">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-friend-note">備考（任意）</label>
+          <input type="text" id="new-friend-note" class="form-input" placeholder="例: 地元フレンド / ポケGOキラ交換待ち" maxlength="80">
+        </div>
+        <button class="btn btn-primary" id="btn-add-friend" style="width: 100%; margin-top: 4px;">
+          フレンドを追加する
+        </button>
+      </div>
+
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin: 12px 0 8px;">登録済みフレンド一覧</div>
+      <ul class="friend-list" id="friend-list-container">
+        <!-- フレンド一覧がここに動的挿入されます -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    /**
+     * =========================================================================
+     * 設定エリア（パスワード・Supabase接続情報）
+     * =========================================================================
+     */
+    // 簡易ログイン用の合言葉（パスワード）
+    const APP_PASSWORD = "your_password_here";
+
+    // Supabase プロジェクト接続情報
+    // ※Supabaseダッシュボードの Project Settings -> API より取得した値を設定してください。
+    const SUPABASE_URL = "https://your-project.supabase.co";
+    const SUPABASE_KEY = "your-anon-key";
+
+    /**
+     * =========================================================================
+     * Supabase セットアップ用 SQLクエリ例
+     * 
+     * Supabaseダッシュボードの「SQL Editor」で以下のSQLを実行してテーブルを作成してください。
+     * 
+     * -- 1. フレンド管理テーブル（名前、トレーナーコード、備考）
+     * CREATE TABLE IF NOT EXISTS pokefuta_friends (
+     *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+     *   name TEXT NOT NULL,
+     *   trainer_code TEXT,
+     *   note TEXT,
+     *   created_at TIMESTAMPTZ DEFAULT now()
+     * );
+     * 
+     * -- ※すでに pokefuta_friends テーブルを作成済みの場合は以下でカラムを追加できます：
+     * -- ALTER TABLE pokefuta_friends ADD COLUMN IF NOT EXISTS trainer_code TEXT;
+     * -- ALTER TABLE pokefuta_friends ADD COLUMN IF NOT EXISTS note TEXT;
+     * 
+     * -- 2. ポケふた記録テーブル
+     * CREATE TABLE IF NOT EXISTS pokefuta_records (
+     *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+     *   spot_id TEXT UNIQUE NOT NULL,
+     *   acquired_date DATE,
+     *   friend_name TEXT,
+     *   updated_at TIMESTAMPTZ DEFAULT now()
+     * );
+     * 
+     * -- 3. Row Level Security (RLS) 設定（誰でもアクセス可能にする場合）
+     * ALTER TABLE pokefuta_friends ENABLE ROW LEVEL SECURITY;
+     * CREATE POLICY "Allow public all friends" ON pokefuta_friends FOR ALL USING (true) WITH CHECK (true);
+     * 
+     * ALTER TABLE pokefuta_records ENABLE ROW LEVEL SECURITY;
+     * CREATE POLICY "Allow public all records" ON pokefuta_records FOR ALL USING (true) WITH CHECK (true);
+     * 
+     * -- 4. リアルタイム同期の有効化
+     * ALTER PUBLICATION supabase_realtime ADD TABLE pokefuta_friends;
+     * ALTER PUBLICATION supabase_realtime ADD TABLE pokefuta_records;
+     * =========================================================================
+     */
+
+    // 状態管理
+    let map = null;
+    let markers = {};
+    let friends = [];
+    let records = {}; // { [spot_id]: { acquired_date, friend_name } }
+    let currentFilter = "all";
+    let supabaseClient = null;
+    let isSupabaseConfigured = false;
+
+    // LocalStorage キー
+    const STORAGE_KEY_AUTH = "pokefuta_auth_token";
+    const STORAGE_KEY_LOCAL_FRIENDS = "pokefuta_local_friends";
+    const STORAGE_KEY_LOCAL_RECORDS = "pokefuta_local_records";
+
+    // DOM要素
+    const loginModal = document.getElementById("login-modal");
+    const loginCard = document.getElementById("login-card");
+    const loginForm = document.getElementById("login-form");
+    const passwordInput = document.getElementById("password-input");
+    const loginError = document.getElementById("login-error");
+    const btnLogout = document.getElementById("btn-logout");
+
+    const friendModal = document.getElementById("friend-modal");
+    const btnOpenFriends = document.getElementById("btn-open-friends");
+    const btnCloseFriends = document.getElementById("btn-close-friends");
+    const newFriendNameInput = document.getElementById("new-friend-name");
+    const newFriendCodeInput = document.getElementById("new-friend-code");
+    const newFriendNoteInput = document.getElementById("new-friend-note");
+    const btnAddFriend = document.getElementById("btn-add-friend");
+    const friendListContainer = document.getElementById("friend-list-container");
+
+    const progressFill = document.getElementById("progress-fill");
+    const progressText = document.getElementById("progress-text");
+    const syncDot = document.getElementById("sync-dot");
+    const syncText = document.getElementById("sync-text");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+
+    /**
+     * 認証処理
+     */
+    function initAuth() {
+      const isAuthed = localStorage.getItem(STORAGE_KEY_AUTH) === "authenticated";
+      if (isAuthed) {
+        loginModal.classList.remove("active");
+        startApp();
+      } else {
+        loginModal.classList.add("active");
+        passwordInput.focus();
+      }
+
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const inputVal = passwordInput.value.trim();
+        if (inputVal === APP_PASSWORD) {
+          localStorage.setItem(STORAGE_KEY_AUTH, "authenticated");
+          loginError.style.display = "none";
+          loginModal.classList.remove("active");
+          startApp();
+        } else {
+          loginError.style.display = "block";
+          loginCard.classList.remove("shake");
+          void loginCard.offsetWidth; // リフロー発生
+          loginCard.classList.add("shake");
+          passwordInput.select();
+        }
+      });
+
+      btnLogout.addEventListener("click", () => {
+        if (confirm("ログアウトして合言葉入力画面に戻りますか？")) {
+          localStorage.removeItem(STORAGE_KEY_AUTH);
+          location.reload();
+        }
+      });
+    }
+
+    /**
+     * Supabaseクライアントの初期化
+     */
+    function initSupabase() {
+      if (
+        SUPABASE_URL &&
+        !SUPABASE_URL.includes("your-project") &&
+        SUPABASE_KEY &&
+        !SUPABASE_KEY.includes("your-anon-key") &&
+        window.supabase
+      ) {
+        try {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          isSupabaseConfigured = true;
+          syncDot.classList.remove("offline");
+          syncText.textContent = "Supabase 接続中";
+          setupRealtimeSubscription();
+        } catch (err) {
+          console.warn("Supabase初期化エラー:", err);
+          isSupabaseConfigured = false;
+          syncDot.classList.add("offline");
+          syncText.textContent = "ローカル保存モード";
+        }
+      } else {
+        isSupabaseConfigured = false;
+        syncDot.classList.add("offline");
+        syncText.textContent = "ローカル保存モード";
+      }
+    }
+
+    /**
+     * データのロード（Supabase または LocalStorage）
+     */
+    async function loadData() {
+      if (isSupabaseConfigured && supabaseClient) {
+        try {
+          // フレンド一覧取得
+          const { data: friendsData, error: fError } = await supabaseClient
+            .from("pokefuta_friends")
+            .select("*")
+            .order("created_at", { ascending: true });
+
+          if (!fError && friendsData) {
+            friends = friendsData;
+          }
+
+          // 記録データ取得
+          const { data: recordsData, error: rError } = await supabaseClient
+            .from("pokefuta_records")
+            .select("*");
+
+          if (!rError && recordsData) {
+            records = {};
+            recordsData.forEach(item => {
+              records[item.spot_id] = {
+                acquired_date: item.acquired_date || "",
+                friend_name: item.friend_name || ""
+              };
+            });
+          }
+        } catch (e) {
+          console.error("Supabaseデータ取得エラー。ローカルデータを参照します:", e);
+          loadLocalStorageData();
+        }
+      } else {
+        loadLocalStorageData();
+      }
+
+      updateAllMarkers();
+      updateStatistics();
+      renderFriendList();
+    }
+
+    function loadLocalStorageData() {
+      try {
+        const savedFriends = localStorage.getItem(STORAGE_KEY_LOCAL_FRIENDS);
+        friends = savedFriends ? JSON.parse(savedFriends) : [
+          { id: "f1", name: "サトシ", trainer_code: "1234 5678 9012", note: "マサラタウン / キラ交換待ち" },
+          { id: "f2", name: "カスミ", trainer_code: "9876 5432 1098", note: "ハナダシティ" }
+        ];
+
+        const savedRecords = localStorage.getItem(STORAGE_KEY_LOCAL_RECORDS);
+        records = savedRecords ? JSON.parse(savedRecords) : {};
+      } catch (e) {
+        console.error("LocalStorage読み込みエラー:", e);
+        friends = [];
+        records = {};
+      }
+    }
+
+    /**
+     * Supabase リアルタイム監視のセットアップ
+     */
+    function setupRealtimeSubscription() {
+      if (!supabaseClient) return;
+
+      supabaseClient
+        .channel("pokefuta_changes")
+        .on("postgres_changes", { event: "*", schema: "public", table: "pokefuta_records" }, (payload) => {
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            const row = payload.new;
+            records[row.spot_id] = {
+              acquired_date: row.acquired_date || "",
+              friend_name: row.friend_name || ""
+            };
+            updateSingleMarker(row.spot_id);
+            updateStatistics();
+          } else if (payload.eventType === "DELETE") {
+            const row = payload.old;
+            if (row && row.spot_id) {
+              delete records[row.spot_id];
+              updateSingleMarker(row.spot_id);
+              updateStatistics();
+            }
+          }
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "pokefuta_friends" }, () => {
+          refreshFriendsFromSupabase();
+        })
+        .subscribe();
+    }
+
+    async function refreshFriendsFromSupabase() {
+      if (!supabaseClient) return;
+      const { data } = await supabaseClient.from("pokefuta_friends").select("*").order("created_at", { ascending: true });
+      if (data) {
+        friends = data;
+        renderFriendList();
+      }
+    }
+
+    /**
+     * ステータス判定
+     * - acquired: 自分で獲得（取得日に値がある）
+     * - received: 人からもらった（取得日が空 かつ フレンド名がある）
+     * - unacquired: 未所持（どちらも空）
+     */
+    function getSpotStatus(spotId) {
+      const rec = records[spotId];
+      if (!rec) return "unacquired";
+
+      const hasDate = rec.acquired_date && rec.acquired_date.trim() !== "";
+      const hasFriend = rec.friend_name && rec.friend_name.trim() !== "";
+
+      if (hasDate) {
+        return "acquired"; // 自分で獲得（オレンジ）
+      } else if (hasFriend) {
+        return "received"; // 人からもらった（青）
+      } else {
+        return "unacquired"; // 未所持（グレー）
+      }
+    }
+
+    /**
+     * マーカーアイコン生成（SVGベース）
+     */
+    function createMarkerIcon(status) {
+      let pinClass = "pin-gray";
+      let iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>`;
+
+      if (status === "acquired") {
+        pinClass = "pin-orange";
+        iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      } else if (status === "received") {
+        pinClass = "pin-blue";
+        iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>`;
+      }
+
+      return L.divIcon({
+        className: "",
+        iconSize: [36, 44],
+        iconAnchor: [18, 44],
+        popupAnchor: [0, -42],
+        html: `
+          <div class="custom-marker-pin ${pinClass}">
+            <div class="pin-body">
+              <div class="pin-content">
+                ${iconSvg}
+              </div>
+            </div>
+          </div>
+        `
+      });
+    }
+
+    /**
+     * 地図の初期化
+     */
+    function initMap() {
+      if (map) return;
+
+      // 宮城県中心付近を初期表示（lat: 38.35, lng: 140.95）
+      map = L.map("map", {
+        zoomControl: true
+      }).setView([38.35, 140.95], 9);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18
+      }).addTo(map);
+
+      // マーカーを生成
+      if (window.pokefutaData && Array.isArray(window.pokefutaData)) {
+        window.pokefutaData.forEach(spot => {
+          const status = getSpotStatus(spot.id);
+          const marker = L.marker([spot.lat, spot.lng], {
+            icon: createMarkerIcon(status)
+          }).addTo(map);
+
+          // カーソルを合わせたときのホバーツールチップ
+          marker.bindTooltip(() => createTooltipContent(spot), {
+            direction: "top",
+            offset: [0, -40],
+            opacity: 0.96,
+            className: "custom-tooltip"
+          });
+
+          // マーカークリック時の詳細ポップアップ
+          marker.bindPopup(() => createPopupContent(spot), {
+            maxWidth: 340,
+            className: "custom-leaflet-popup"
+          });
+
+          markers[spot.id] = marker;
+        });
+      }
+    }
+
+    /**
+     * カーソルホバー用ツールチップHTMLの構築
+     */
+    function createTooltipContent(spot) {
+      const displayAddress = spot.address || `${spot.prefecture}${spot.city}${spot.location}`;
+      return `
+        <div class="tooltip-card">
+          <div class="tooltip-region">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>${escapeHtml(spot.prefecture)} ${escapeHtml(spot.city)}</span>
+          </div>
+          <div class="tooltip-address">
+            <span>📍 ${escapeHtml(displayAddress)}</span>
+          </div>
+          <div class="tooltip-name">
+            ポケふた: ${escapeHtml(spot.name)}
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * ポップアップHTMLの構築
+     */
+    function createPopupContent(spot) {
+      const rec = records[spot.id] || { acquired_date: "", friend_name: "" };
+      const status = getSpotStatus(spot.id);
+
+      let badgeHtml = "";
+      if (status === "acquired") {
+        badgeHtml = '<span class="popup-badge badge-orange">自分で獲得</span>';
+      } else if (status === "received") {
+        badgeHtml = '<span class="popup-badge badge-blue">人からもらった</span>';
+      } else {
+        badgeHtml = '<span class="popup-badge badge-gray">未所持</span>';
+      }
+
+      let friendOptions = `<option value="">（指定なし / 未選択）</option>`;
+      friends.forEach(f => {
+        const isSelected = rec.friend_name === f.name ? "selected" : "";
+        const label = f.note ? `${escapeHtml(f.name)} (${escapeHtml(f.note)})` : escapeHtml(f.name);
+        friendOptions += `<option value="${escapeHtml(f.name)}" ${isSelected}>${label}</option>`;
+      });
+
+      const displayAddress = spot.address || `${spot.prefecture}${spot.city}${spot.location}`;
+
+      const container = document.createElement("div");
+      container.className = "popup-card";
+      container.innerHTML = `
+        <div class="popup-header">
+          ${badgeHtml}
+          <!-- prefecture と city を最上位タイトルとして目立たせる -->
+          <div class="popup-region-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>${escapeHtml(spot.prefecture)} ${escapeHtml(spot.city)}</span>
+          </div>
+          
+          <!-- address (住所) 欄 -->
+          <div class="popup-address-box">
+            <span class="popup-address-label">住所</span>
+            <span class="popup-address-text">${escapeHtml(displayAddress)} (${escapeHtml(spot.location)})</span>
+          </div>
+
+          <!-- name (ポケモン名) をサブ要素として配置 -->
+          <div class="popup-pokemon-name">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>
+            <span>${escapeHtml(spot.name)}</span>
+          </div>
+        </div>
+
+        <div class="popup-form">
+          <div class="form-group">
+            <label class="form-label" for="date-${spot.id}">取得日（自分で獲得した場合）</label>
+            <input type="date" id="date-${spot.id}" class="form-input" value="${rec.acquired_date || ""}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="friend-${spot.id}">フレンド名（もらった場合）</label>
+            <select id="friend-${spot.id}" class="form-select">
+              ${friendOptions}
+            </select>
+          </div>
+        </div>
+
+        <div class="popup-actions">
+          <button class="btn btn-primary" id="btn-save-${spot.id}" style="width: 100%;">
+            保存する
+          </button>
+          ${
+            spot.officialUrl ? `
+              <a href="${spot.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-official">
+                <span>ポケふた公式サイトを見る</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            ` : ""
+          }
+        </div>
+      `;
+
+      // 保存ボタンのイベント登録
+      const saveBtn = container.querySelector(`#btn-save-${spot.id}`);
+      saveBtn.addEventListener("click", async () => {
+        const dateVal = container.querySelector(`#date-${spot.id}`).value;
+        const friendVal = container.querySelector(`#friend-${spot.id}`).value;
+        saveBtn.disabled = true;
+        saveBtn.textContent = "保存中...";
+
+        await saveRecord(spot.id, dateVal, friendVal);
+        
+        saveBtn.textContent = "保存完了!";
+        setTimeout(() => {
+          if (map) map.closePopup();
+        }, 350);
+      });
+
+      return container;
+    }
+
+    /**
+     * 記録の保存処理
+     */
+    async function saveRecord(spotId, acquiredDate, friendName) {
+      records[spotId] = {
+        acquired_date: acquiredDate,
+        friend_name: friendName
+      };
+
+      if (isSupabaseConfigured && supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from("pokefuta_records")
+            .upsert({
+              spot_id: spotId,
+              acquired_date: acquiredDate || null,
+              friend_name: friendName || null,
+              updated_at: new Date().toISOString()
+            }, { onConflict: "spot_id" });
+
+          if (error) throw error;
+        } catch (err) {
+          console.error("Supabase保存エラー。LocalStorageに保存します:", err);
+          saveToLocalStorage();
+        }
+      } else {
+        saveToLocalStorage();
+      }
+
+      updateSingleMarker(spotId);
+      updateStatistics();
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_LOCAL_RECORDS, JSON.stringify(records));
+      } catch (e) {
+        console.error("LocalStorage書き込みエラー:", e);
+      }
+    }
+
+    /**
+     * マーカー更新
+     */
+    function updateSingleMarker(spotId) {
+      const marker = markers[spotId];
+      if (!marker) return;
+
+      const status = getSpotStatus(spotId);
+      marker.setIcon(createMarkerIcon(status));
+
+      // フィルター適用
+      applyFilterToMarker(spotId, marker, status);
+    }
+
+    function updateAllMarkers() {
+      if (!window.pokefutaData) return;
+      window.pokefutaData.forEach(spot => {
+        updateSingleMarker(spot.id);
+      });
+    }
+
+    function applyFilterToMarker(spotId, marker, status) {
+      if (currentFilter === "all" || currentFilter === status) {
+        if (!map.hasLayer(marker)) {
+          marker.addTo(map);
+        }
+      } else {
+        if (map.hasLayer(marker)) {
+          map.removeLayer(marker);
+        }
+      }
+    }
+
+    /**
+     * 統計バー・フィルター件数の更新
+     */
+    function updateStatistics() {
+      const allSpots = window.pokefutaData || [];
+      const total = allSpots.length;
+
+      let countAcquired = 0;
+      let countReceived = 0;
+      let countUnacquired = 0;
+
+      allSpots.forEach(spot => {
+        const s = getSpotStatus(spot.id);
+        if (s === "acquired") countAcquired++;
+        else if (s === "received") countReceived++;
+        else countUnacquired++;
+      });
+
+      const rate = total > 0 ? Math.round((countAcquired / total) * 100) : 0;
+
+      // 統計表示更新
+      progressFill.style.width = `${rate}%`;
+      progressText.textContent = `自分で獲得: ${countAcquired} / ${total} (${rate}%)`;
+
+      // フィルターバッジ更新
+      document.getElementById("count-all").textContent = total;
+      document.getElementById("count-acquired").textContent = countAcquired;
+      document.getElementById("count-received").textContent = countReceived;
+      document.getElementById("count-unacquired").textContent = countUnacquired;
+    }
+
+    /**
+     * フィルター切り替え
+     */
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        updateAllMarkers();
+      });
+    });
+
+    /**
+     * フレンド管理機能
+     */
+    btnOpenFriends.addEventListener("click", () => {
+      friendModal.classList.add("active");
+      renderFriendList();
+      newFriendNameInput.focus();
+    });
+
+    btnCloseFriends.addEventListener("click", () => {
+      friendModal.classList.remove("active");
+    });
+
+    friendModal.addEventListener("click", (e) => {
+      if (e.target === friendModal) {
+        friendModal.classList.remove("active");
+      }
+    });
+
+    btnAddFriend.addEventListener("click", addFriend);
+    [newFriendNameInput, newFriendCodeInput, newFriendNoteInput].forEach(input => {
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addFriend();
+        }
+      });
+    });
+
+    async function addFriend() {
+      const name = newFriendNameInput.value.trim();
+      const trainerCode = newFriendCodeInput.value.trim();
+      const note = newFriendNoteInput.value.trim();
+
+      if (!name) {
+        alert("フレンドの名前を入力してください。");
+        return;
+      }
+
+      if (friends.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+        alert("同名のフレンドがすでに登録されています。");
+        return;
+      }
+
+      const tempId = "f_" + Date.now();
+      const newFriend = {
+        id: tempId,
+        name: name,
+        trainer_code: trainerCode,
+        note: note
+      };
+
+      if (isSupabaseConfigured && supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from("pokefuta_friends")
+            .insert([{
+              name: name,
+              trainer_code: trainerCode || null,
+              note: note || null
+            }])
+            .select();
+
+          if (!error && data && data.length > 0) {
+            friends.push(data[0]);
+          } else {
+            friends.push(newFriend);
+          }
+        } catch (e) {
+          console.error("Supabaseフレンド追加エラー:", e);
+          friends.push(newFriend);
+          saveFriendsToLocalStorage();
+        }
+      } else {
+        friends.push(newFriend);
+        saveFriendsToLocalStorage();
+      }
+
+      newFriendNameInput.value = "";
+      newFriendCodeInput.value = "";
+      newFriendNoteInput.value = "";
+      renderFriendList();
+    }
+
+    async function deleteFriend(id, name) {
+      if (!confirm(`フレンド「${name}」を削除しますか？`)) return;
+
+      friends = friends.filter(f => f.id !== id);
+
+      if (isSupabaseConfigured && supabaseClient) {
+        try {
+          await supabaseClient.from("pokefuta_friends").delete().eq("id", id);
+        } catch (e) {
+          console.error("Supabaseフレンド削除エラー:", e);
+          saveFriendsToLocalStorage();
+        }
+      } else {
+        saveFriendsToLocalStorage();
+      }
+
+      renderFriendList();
+    }
+
+    function saveFriendsToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_LOCAL_FRIENDS, JSON.stringify(friends));
+      } catch (e) {
+        console.error("LocalStorage書き込みエラー:", e);
+      }
+    }
+
+    function renderFriendList() {
+      friendListContainer.innerHTML = "";
+
+      if (friends.length === 0) {
+        friendListContainer.innerHTML = `
+          <div class="empty-state">
+            フレンドがまだ登録されていません。<br>
+            上のフォームから追加してください。
+          </div>
+        `;
+        return;
+      }
+
+      friends.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "friend-item";
+
+        const codeBadgeHtml = f.trainer_code ? `
+          <div class="friend-code-badge" data-code="${escapeHtml(f.trainer_code)}" title="クリックしてコピー">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span class="code-text">${escapeHtml(f.trainer_code)}</span>
+          </div>
+        ` : "";
+
+        const noteHtml = f.note ? `
+          <div class="friend-note">${escapeHtml(f.note)}</div>
+        ` : "";
+
+        li.innerHTML = `
+          <div class="friend-item-header">
+            <span class="friend-name">${escapeHtml(f.name)}</span>
+            <div class="friend-actions">
+              <button class="btn btn-secondary btn-sm btn-delete-friend" data-id="${f.id}" data-name="${escapeHtml(f.name)}" style="color: #EF4444; padding: 3px 8px;">
+                削除
+              </button>
+            </div>
+          </div>
+          ${codeBadgeHtml}
+          ${noteHtml}
+        `;
+
+        // トレーナーコードのクリックコピー機能
+        const codeBadge = li.querySelector(".friend-code-badge");
+        if (codeBadge) {
+          codeBadge.addEventListener("click", () => {
+            const codeToCopy = codeBadge.dataset.code;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(codeToCopy).then(() => {
+                const textSpan = codeBadge.querySelector(".code-text");
+                const originalText = textSpan.textContent;
+                textSpan.textContent = "コピー完了!";
+                setTimeout(() => {
+                  textSpan.textContent = originalText;
+                }, 1200);
+              }).catch(() => {
+                prompt("トレーナーコードをコピーしてください:", codeToCopy);
+              });
+            } else {
+              prompt("トレーナーコードをコピーしてください:", codeToCopy);
+            }
+          });
+        }
+
+        li.querySelector(".btn-delete-friend").addEventListener("click", () => {
+          deleteFriend(f.id, f.name);
+        });
+
+        friendListContainer.appendChild(li);
+      });
+    }
+
+    /**
+     * ユーティリティ
+     */
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    /**
+     * アプリ開始処理
+     */
+    function startApp() {
+      initSupabase();
+      initMap();
+      loadData();
+    }
+
+    // 起動時実行
+    window.addEventListener("DOMContentLoaded", () => {
+      initAuth();
+    });
+  </script>
+</body>
+</html>

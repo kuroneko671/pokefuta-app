@@ -1,0 +1,413 @@
+/**
+ * ポケふた（ポケモンマンホール）マスターデータ
+ * ぽけふた宮城.csv より正確な住所情報（address）を含めて更新されたデータ一覧です。
+ */
+window.pokefutaData = [
+  {
+    id: "474",
+    name: "ラプラス・チョンチー・ホエルコ・ウミディグダ",
+    prefecture: "宮城県",
+    city: "仙台市",
+    location: "海岸公園（藤塚地区）",
+    address: "宮城県仙台市若林区藤塚地内",
+    lat: 38.182602,
+    lng: 140.956528,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/474/"
+  },
+  {
+    id: "447",
+    name: "ラプラス・スワンナ・タマンタ",
+    prefecture: "宮城県",
+    city: "利府町",
+    location: "加瀬沼公園",
+    address: "宮城県宮城郡利府町加瀬新堤下",
+    lat: 38.311641,
+    lng: 140.983236,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/447/"
+  },
+  {
+    id: "139",
+    name: "ラプラス・ドードー・ドードリオ",
+    prefecture: "宮城県",
+    city: "美里町",
+    location: "でんえん土田畑村",
+    address: "宮城県美里町木間塚原田5",
+    lat: 38.489061,
+    lng: 141.133053,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/139/"
+  },
+  {
+    id: "138",
+    name: "ラプラス・バンバドロ",
+    prefecture: "宮城県",
+    city: "涌谷町",
+    location: "くがね創庫",
+    address: "宮城県涌谷町字新町裏110",
+    lat: 38.5392702,
+    lng: 141.1267433,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/138/"
+  },
+  {
+    id: "137",
+    name: "ラプラス・ロゼリア",
+    prefecture: "宮城県",
+    city: "加美町",
+    location: "やくらい薬師の湯",
+    address: "宮城県加美町味ヶ袋薬莱原1-76",
+    lat: 38.57215,
+    lng: 140.72859,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/137/"
+  },
+  {
+    id: "136",
+    name: "ラプラス・ハスブレロ",
+    prefecture: "宮城県",
+    city: "色麻町",
+    location: "愛宕山公園",
+    address: "宮城県色麻町四竃字東原1-12",
+    lat: 38.530136,
+    lng: 140.86142,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/136/"
+  },
+  {
+    id: "135",
+    name: "ラプラス・プルリル・ラブカス",
+    prefecture: "宮城県",
+    city: "大衡村",
+    location: "万葉・おおひら館",
+    address: "宮城県大衡村大衡字鐙沢12-2",
+    lat: 38.46943814,
+    lng: 140.8902292,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/135/"
+  },
+  {
+    id: "134",
+    name: "ラプラス・チュリネ",
+    prefecture: "宮城県",
+    city: "大郷町",
+    location: "道の駅おおさと",
+    address: "宮城県大郷町中村字北浦51-6",
+    lat: 38.424016,
+    lng: 140.992673,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/134/"
+  },
+  {
+    id: "133",
+    name: "ラプラス・タマゲタケ・ドダイトス",
+    prefecture: "宮城県",
+    city: "大和町",
+    location: "大和町役場",
+    address: "宮城県大和町吉岡まほろば一丁目1-1前",
+    lat: 38.437364,
+    lng: 140.885648,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/133/"
+  },
+  {
+    id: "132",
+    name: "ラプラス・ニャース・ニャスパー",
+    prefecture: "宮城県",
+    city: "丸森町",
+    location: "町東ポケットパーク付近",
+    address: "宮城県丸森町字町東77-1",
+    lat: 37.913873,
+    lng: 140.762531,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/132/"
+  },
+  {
+    id: "131",
+    name: "ラプラス",
+    prefecture: "宮城県",
+    city: "川崎町",
+    location: "川崎町役場",
+    address: "宮城県川崎町前川字裏丁175-1",
+    lat: 38.177534,
+    lng: 140.643653,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/131/"
+  },
+  {
+    id: "130",
+    name: "ラプラス・フラベベ",
+    prefecture: "宮城県",
+    city: "柴田町",
+    location: "船岡駅",
+    address: "宮城県柴田町船岡中央1丁目1-1",
+    lat: 38.059143,
+    lng: 140.768239,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/130/"
+  },
+  {
+    id: "129",
+    name: "ラプラス・ベロベルト",
+    prefecture: "宮城県",
+    city: "村田町",
+    location: "道の駅村田",
+    address: "宮城県村田町大字村田字北塩内41",
+    lat: 38.119071,
+    lng: 140.717821,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/129/"
+  },
+  {
+    id: "128",
+    name: "ラプラス・チェリム",
+    prefecture: "宮城県",
+    city: "大河原町",
+    location: "白石川公園",
+    address: "宮城県大河原町大谷字町向116-26地先",
+    lat: 38.0485032,
+    lng: 140.738089,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/128/"
+  },
+  {
+    id: "127",
+    name: "ラプラス・ビーダル",
+    prefecture: "宮城県",
+    city: "七ヶ宿町",
+    location: "道の駅七ヶ宿",
+    address: "宮城県七ヶ宿町上野8-1",
+    lat: 37.982523,
+    lng: 140.46662,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/127/"
+  },
+  {
+    id: "126",
+    name: "ラプラス・ユキノオー",
+    prefecture: "宮城県",
+    city: "蔵王町",
+    location: "遠刈田温泉イベント広場",
+    address: "宮城県蔵王町遠刈田温泉仲町34",
+    lat: 38.123663,
+    lng: 140.577192,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/126/"
+  },
+  {
+    id: "125",
+    name: "ラプラス・ブルー",
+    prefecture: "宮城県",
+    city: "富谷市",
+    location: "とみやど",
+    address: "宮城県富谷市富谷新町111",
+    lat: 38.398336,
+    lng: 140.8875,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/125/"
+  },
+  {
+    id: "124",
+    name: "ラプラス・ダグトリオ・オニスズメ",
+    prefecture: "宮城県",
+    city: "大崎市",
+    location: "古川駅",
+    address: "宮城県大崎市古川駅前大通1丁目5",
+    lat: 38.571356,
+    lng: 140.967465,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/124/"
+  },
+  {
+    id: "123",
+    name: "ラプラス・コアルヒー",
+    prefecture: "宮城県",
+    city: "栗原市",
+    location: "道の駅路田里はなやま",
+    address: "宮城県栗原市花山字本沢北ノ前112-1",
+    lat: 38.794479,
+    lng: 140.844403,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/123/"
+  },
+  {
+    id: "122",
+    name: "ラプラス・ハスボー",
+    prefecture: "宮城県",
+    city: "登米市",
+    location: "平筒沼ふれあい公園",
+    address: "宮城県登米市米山町字桜岡貝待井581-2",
+    lat: 38.616649,
+    lng: 141.235491,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/122/"
+  },
+  {
+    id: "121",
+    name: "ラプラス・ラティアス",
+    prefecture: "宮城県",
+    city: "角田市",
+    location: "道の駅かくだ",
+    address: "宮城県角田市枝野字北島81-1",
+    lat: 37.968694,
+    lng: 140.807077,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/121/"
+  },
+  {
+    id: "120",
+    name: "ラプラス・クスネ",
+    prefecture: "宮城県",
+    city: "白石市",
+    location: "白石城跡",
+    address: "宮城県白石市益岡町1-16",
+    lat: 38.002511,
+    lng: 140.61735,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/120/"
+  },
+  {
+    id: "58",
+    name: "ラプラス・ラッキー",
+    prefecture: "宮城県",
+    city: "山元町",
+    location: "坂元駅",
+    address: "宮城県山元町坂元字町東31-10",
+    lat: 37.923988,
+    lng: 140.900996,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/58/"
+  },
+  {
+    id: "57",
+    name: "ラプラス・チルット・ムックル・スバメ・マメパト",
+    prefecture: "宮城県",
+    city: "亘理町",
+    location: "鳥の海公園",
+    address: "宮城県亘理町荒浜字隈崎9-2",
+    lat: 38.04217,
+    lng: 140.915724,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/57/"
+  },
+  {
+    id: "56",
+    name: "ラプラス・トゲピー",
+    prefecture: "宮城県",
+    city: "岩沼市",
+    location: "歩道上",
+    address: "宮城県岩沼市中央1丁目2-13",
+    lat: 38.105296,
+    lng: 140.866325,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/56/"
+  },
+  {
+    id: "55",
+    name: "ラプラス",
+    prefecture: "宮城県",
+    city: "名取市",
+    location: "名取市震災メモリアル公園",
+    address: "宮城県名取市閖上五丁目",
+    lat: 38.17213,
+    lng: 140.954044,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/55/"
+  },
+  {
+    id: "54",
+    name: "ラプラス・ジラーチ",
+    prefecture: "宮城県",
+    city: "仙台市",
+    location: "サンモール一番町",
+    address: "宮城県仙台市青葉区一番町二丁目6-5",
+    lat: 38.258587,
+    lng: 140.872666,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/54/"
+  },
+  {
+    id: "53",
+    name: "ラプラス・タッツー",
+    prefecture: "宮城県",
+    city: "多賀城市",
+    location: "多賀城駅前広場",
+    address: "宮城県多賀城市中央2丁目7番地",
+    lat: 38.291943,
+    lng: 141.007158,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/53/"
+  },
+  {
+    id: "52",
+    name: "ラプラス・メタモン・ヒトデマン",
+    prefecture: "宮城県",
+    city: "七ヶ浜町",
+    location: "七ヶ浜町観光交流センター",
+    address: "宮城県七ヶ浜町花渕浜字館下75",
+    lat: 38.304315,
+    lng: 141.083342,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/52/"
+  },
+  {
+    id: "51",
+    name: "ラプラス・マイナン",
+    prefecture: "宮城県",
+    city: "利府町",
+    location: "利府町役場",
+    address: "宮城県利府町利府字新並松4",
+    lat: 38.329512,
+    lng: 140.975248,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/51/"
+  },
+  {
+    id: "50",
+    name: "ラプラス・プラスル",
+    prefecture: "宮城県",
+    city: "塩竈市",
+    location: "本塩釜駅",
+    address: "宮城県塩竈市海岸通200-15",
+    lat: 38.318226,
+    lng: 141.023075,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/50/"
+  },
+  {
+    id: "49",
+    name: "ラプラス",
+    prefecture: "宮城県",
+    city: "松島町",
+    location: "松島海岸",
+    address: "宮城県松島町松島字浪打浜地内",
+    lat: 38.368987,
+    lng: 141.061207,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/49/"
+  },
+  {
+    id: "48",
+    name: "ラプラス・ラティオス",
+    prefecture: "宮城県",
+    city: "東松島市",
+    location: "野蒜駅",
+    address: "宮城県東松島市野蒜ケ丘一丁目15-1",
+    lat: 38.379414,
+    lng: 141.15671,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/48/"
+  },
+  {
+    id: "47",
+    name: "ラプラス・ニャース・ニャビー・エネコ・ニャルマー",
+    prefecture: "宮城県",
+    city: "石巻市",
+    location: "石巻市役所付近",
+    address: "宮城県石巻市穀町14番1号",
+    lat: 38.433844,
+    lng: 141.303041,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/47/"
+  },
+  {
+    id: "46",
+    name: "ラプラス・キャモメ",
+    prefecture: "宮城県",
+    city: "女川町",
+    location: "女川町まちなか交流館付近",
+    address: "宮城県女川町女川浜字大原1-4",
+    lat: 38.445695,
+    lng: 141.44623,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/46/"
+  },
+  {
+    id: "45",
+    name: "ラプラス・オクタン",
+    prefecture: "宮城県",
+    city: "南三陸町",
+    location: "南三陸ハマーレ歌津",
+    address: "宮城県南三陸町歌津字伊里前96-1",
+    lat: 38.717061,
+    lng: 141.52115,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/45/"
+  },
+  {
+    id: "44",
+    name: "ラプラス・イシツブテ",
+    prefecture: "宮城県",
+    city: "気仙沼市",
+    location: "気仙沼市まち・ひと・しごと交流プラザ",
+    address: "宮城県気仙沼市南町海岸1-14",
+    lat: 38.905694,
+    lng: 141.574667,
+    officialUrl: "https://local.pokemon.jp/manhole/desc/44/"
+  }
+];
