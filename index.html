@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
   <title>ポケふた スタンプラリー管理アプリ</title>
 
   <!-- Google Fonts -->
@@ -937,9 +938,14 @@
           <input type="email" id="email-input" class="form-input" placeholder="example@family.com" autocomplete="email" required style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
 
-        <div class="form-group" style="margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label" for="password-input">パスワード</label>
           <input type="password" id="password-input" class="form-input" placeholder="6文字以上" autocomplete="current-password" required minlength="6" style="font-size: 0.9rem; padding: 9px 12px;">
+        </div>
+
+        <div class="form-group" id="secret-code-group" style="margin-bottom: 16px; display: none;">
+          <label class="form-label" for="secret-input">家族共通の合言葉（招待コード）</label>
+          <input type="password" id="secret-input" class="form-input" placeholder="合言葉を入力" style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
 
         <button type="submit" class="btn btn-primary" id="btn-auth-submit" style="width: 100%; padding: 10px; font-size: 0.95rem;">
@@ -1054,6 +1060,9 @@
     let currentUser = null;
     let currentAuthMode = "login"; // "login" | "signup"
 
+    // 家族登録用セキュリティ（合言葉）
+    const FAMILY_SECRET_CODE = "fuwante2025";
+
     // LocalStorage キー
     const STORAGE_KEY_LOCAL_FRIENDS = "pokefuta_local_friends";
     const STORAGE_KEY_LOCAL_RECORDS = "pokefuta_local_records";
@@ -1064,6 +1073,8 @@
     const loginForm = document.getElementById("login-form");
     const emailInput = document.getElementById("email-input");
     const passwordInput = document.getElementById("password-input");
+    const secretCodeGroup = document.getElementById("secret-code-group");
+    const secretInput = document.getElementById("secret-input");
     const loginError = document.getElementById("login-error");
     const authSuccess = document.getElementById("auth-success");
     const btnAuthSubmit = document.getElementById("btn-auth-submit");
@@ -1098,6 +1109,8 @@
         currentAuthMode = "login";
         tabLogin.classList.add("active");
         tabSignup.classList.remove("active");
+        secretCodeGroup.style.display = "none";
+        secretInput.required = false;
         btnAuthSubmit.textContent = "ログインする";
         loginError.style.display = "none";
         authSuccess.style.display = "none";
@@ -1107,6 +1120,8 @@
         currentAuthMode = "signup";
         tabSignup.classList.add("active");
         tabLogin.classList.remove("active");
+        secretCodeGroup.style.display = "block";
+        secretInput.required = true;
         btnAuthSubmit.textContent = "新規アカウントを作成";
         loginError.style.display = "none";
         authSuccess.style.display = "none";
@@ -1145,6 +1160,15 @@
             btnAuthSubmit.textContent = "ログインする";
           }
         } else {
+          // 新規登録時の家族合言葉チェック
+          const inputSecret = secretInput.value.trim();
+          if (inputSecret !== FAMILY_SECRET_CODE) {
+            showAuthError("家族共通の合言葉が正しくありません");
+            btnAuthSubmit.disabled = false;
+            btnAuthSubmit.textContent = "新規アカウントを作成";
+            return;
+          }
+
           // 新規登録
           btnAuthSubmit.textContent = "アカウント作成中...";
           if (isSupabaseConfigured && supabaseClient) {
@@ -1951,13 +1975,13 @@
      * アプリ開始処理
      */
     function startApp() {
-      initSupabase();
       initMap();
       loadData();
     }
 
     // 起動時実行
     window.addEventListener("DOMContentLoaded", () => {
+      initSupabase();
       initAuth();
     });
   </script>
