@@ -4,7 +4,7 @@
  */
 window.pokefutaData = [
   {
-    id: "474",
+    pokefuta_id: "474",
     name: "ラプラス・チョンチー・ホエルコ・ウミディグダ",
     prefecture: "宮城県",
     city: "仙台市",
@@ -15,7 +15,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/474/"
   },
   {
-    id: "447",
+    pokefuta_id: "447",
     name: "ラプラス・スワンナ・タマンタ",
     prefecture: "宮城県",
     city: "利府町",
@@ -26,7 +26,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/447/"
   },
   {
-    id: "139",
+    pokefuta_id: "139",
     name: "ラプラス・ドードー・ドードリオ",
     prefecture: "宮城県",
     city: "美里町",
@@ -37,7 +37,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/139/"
   },
   {
-    id: "138",
+    pokefuta_id: "138",
     name: "ラプラス・バンバドロ",
     prefecture: "宮城県",
     city: "涌谷町",
@@ -48,7 +48,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/138/"
   },
   {
-    id: "137",
+    pokefuta_id: "137",
     name: "ラプラス・ロゼリア",
     prefecture: "宮城県",
     city: "加美町",
@@ -59,7 +59,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/137/"
   },
   {
-    id: "136",
+    pokefuta_id: "136",
     name: "ラプラス・ハスブレロ",
     prefecture: "宮城県",
     city: "色麻町",
@@ -70,7 +70,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/136/"
   },
   {
-    id: "135",
+    pokefuta_id: "135",
     name: "ラプラス・プルリル・ラブカス",
     prefecture: "宮城県",
     city: "大衡村",
@@ -81,7 +81,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/135/"
   },
   {
-    id: "134",
+    pokefuta_id: "134",
     name: "ラプラス・チュリネ",
     prefecture: "宮城県",
     city: "大郷町",
@@ -92,7 +92,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/134/"
   },
   {
-    id: "133",
+    pokefuta_id: "133",
     name: "ラプラス・タマゲタケ・ドダイトス",
     prefecture: "宮城県",
     city: "大和町",
@@ -103,7 +103,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/133/"
   },
   {
-    id: "132",
+    pokefuta_id: "132",
     name: "ラプラス・ニャース・ニャスパー",
     prefecture: "宮城県",
     city: "丸森町",
@@ -114,7 +114,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/132/"
   },
   {
-    id: "131",
+    pokefuta_id: "131",
     name: "ラプラス",
     prefecture: "宮城県",
     city: "川崎町",
@@ -125,7 +125,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/131/"
   },
   {
-    id: "130",
+    pokefuta_id: "130",
     name: "ラプラス・フラベベ",
     prefecture: "宮城県",
     city: "柴田町",
@@ -136,7 +136,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/130/"
   },
   {
-    id: "129",
+    pokefuta_id: "129",
     name: "ラプラス・ベロベルト",
     prefecture: "宮城県",
     city: "村田町",
@@ -147,7 +147,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/129/"
   },
   {
-    id: "128",
+    pokefuta_id: "128",
     name: "ラプラス・チェリム",
     prefecture: "宮城県",
     city: "大河原町",
@@ -158,7 +158,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/128/"
   },
   {
-    id: "127",
+    pokefuta_id: "127",
     name: "ラプラス・ビーダル",
     prefecture: "宮城県",
     city: "七ヶ宿町",
@@ -169,7 +169,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/127/"
   },
   {
-    id: "126",
+    pokefuta_id: "126",
     name: "ラプラス・ユキノオー",
     prefecture: "宮城県",
     city: "蔵王町",
@@ -180,7 +180,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/126/"
   },
   {
-    id: "125",
+    pokefuta_id: "125",
     name: "ラプラス・ブルー",
     prefecture: "宮城県",
     city: "富谷市",
@@ -191,7 +191,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/125/"
   },
   {
-    id: "124",
+    pokefuta_id: "124",
     name: "ラプラス・ダグトリオ・オニスズメ",
     prefecture: "宮城県",
     city: "大崎市",
@@ -202,7 +202,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/124/"
   },
   {
-    id: "123",
+    pokefuta_id: "123",
     name: "ラプラス・コアルヒー",
     prefecture: "宮城県",
     city: "栗原市",
@@ -213,7 +213,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/123/"
   },
   {
-    id: "122",
+    pokefuta_id: "122",
     name: "ラプラス・ハスボー",
     prefecture: "宮城県",
     city: "登米市",
@@ -224,7 +224,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/122/"
   },
   {
-    id: "121",
+    pokefuta_id: "121",
     name: "ラプラス・ラティアス",
     prefecture: "宮城県",
     city: "角田市",
@@ -235,7 +235,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/121/"
   },
   {
-    id: "120",
+    pokefuta_id: "120",
     name: "ラプラス・クスネ",
     prefecture: "宮城県",
     city: "白石市",
@@ -246,7 +246,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/120/"
   },
   {
-    id: "58",
+    pokefuta_id: "58",
     name: "ラプラス・ラッキー",
     prefecture: "宮城県",
     city: "山元町",
@@ -257,7 +257,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/58/"
   },
   {
-    id: "57",
+    pokefuta_id: "57",
     name: "ラプラス・チルット・ムックル・スバメ・マメパト",
     prefecture: "宮城県",
     city: "亘理町",
@@ -268,7 +268,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/57/"
   },
   {
-    id: "56",
+    pokefuta_id: "56",
     name: "ラプラス・トゲピー",
     prefecture: "宮城県",
     city: "岩沼市",
@@ -279,7 +279,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/56/"
   },
   {
-    id: "55",
+    pokefuta_id: "55",
     name: "ラプラス",
     prefecture: "宮城県",
     city: "名取市",
@@ -290,7 +290,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/55/"
   },
   {
-    id: "54",
+    pokefuta_id: "54",
     name: "ラプラス・ジラーチ",
     prefecture: "宮城県",
     city: "仙台市",
@@ -301,7 +301,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/54/"
   },
   {
-    id: "53",
+    pokefuta_id: "53",
     name: "ラプラス・タッツー",
     prefecture: "宮城県",
     city: "多賀城市",
@@ -312,7 +312,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/53/"
   },
   {
-    id: "52",
+    pokefuta_id: "52",
     name: "ラプラス・メタモン・ヒトデマン",
     prefecture: "宮城県",
     city: "七ヶ浜町",
@@ -323,7 +323,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/52/"
   },
   {
-    id: "51",
+    pokefuta_id: "51",
     name: "ラプラス・マイナン",
     prefecture: "宮城県",
     city: "利府町",
@@ -334,7 +334,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/51/"
   },
   {
-    id: "50",
+    pokefuta_id: "50",
     name: "ラプラス・プラスル",
     prefecture: "宮城県",
     city: "塩竈市",
@@ -345,7 +345,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/50/"
   },
   {
-    id: "49",
+    pokefuta_id: "49",
     name: "ラプラス",
     prefecture: "宮城県",
     city: "松島町",
@@ -356,7 +356,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/49/"
   },
   {
-    id: "48",
+    pokefuta_id: "48",
     name: "ラプラス・ラティオス",
     prefecture: "宮城県",
     city: "東松島市",
@@ -367,7 +367,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/48/"
   },
   {
-    id: "47",
+    pokefuta_id: "47",
     name: "ラプラス・ニャース・ニャビー・エネコ・ニャルマー",
     prefecture: "宮城県",
     city: "石巻市",
@@ -378,7 +378,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/47/"
   },
   {
-    id: "46",
+    pokefuta_id: "46",
     name: "ラプラス・キャモメ",
     prefecture: "宮城県",
     city: "女川町",
@@ -389,7 +389,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/46/"
   },
   {
-    id: "45",
+    pokefuta_id: "45",
     name: "ラプラス・オクタン",
     prefecture: "宮城県",
     city: "南三陸町",
@@ -400,7 +400,7 @@ window.pokefutaData = [
     officialUrl: "https://local.pokemon.jp/manhole/desc/45/"
   },
   {
-    id: "44",
+    pokefuta_id: "44",
     name: "ラプラス・イシツブテ",
     prefecture: "宮城県",
     city: "気仙沼市",

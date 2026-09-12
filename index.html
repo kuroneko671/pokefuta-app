@@ -1249,7 +1249,7 @@
       // マーカーを生成
       if (window.pokefutaData && Array.isArray(window.pokefutaData)) {
         window.pokefutaData.forEach(spot => {
-          const status = getSpotStatus(spot.id);
+          const status = getSpotStatus(spot.pokefuta_id);
           const marker = L.marker([spot.lat, spot.lng], {
             icon: createMarkerIcon(status)
           }).addTo(map);
@@ -1268,7 +1268,7 @@
             className: "custom-leaflet-popup"
           });
 
-          markers[spot.id] = marker;
+          markers[spot.pokefuta_id] = marker;
         });
       }
     }
@@ -1298,8 +1298,8 @@
      * ポップアップHTMLの構築
      */
     function createPopupContent(spot) {
-      const rec = records[spot.id] || { acquired_date: "", friend_name: "" };
-      const status = getSpotStatus(spot.id);
+      const rec = records[spot.pokefuta_id] || { acquired_date: "", friend_name: "" };
+      const status = getSpotStatus(spot.pokefuta_id);
 
       let badgeHtml = "";
       if (status === "acquired") {
@@ -1345,20 +1345,20 @@
 
         <div class="popup-form">
           <div class="form-group">
-            <label class="form-label" for="date-${spot.id}">取得日（自分で獲得した場合）</label>
-            <input type="date" id="date-${spot.id}" class="form-input" value="${rec.acquired_date || ""}">
+            <label class="form-label" for="date-${spot.pokefuta_id}">取得日（自分で獲得した場合）</label>
+            <input type="date" id="date-${spot.pokefuta_id}" class="form-input" value="${rec.acquired_date || ""}">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="friend-${spot.id}">フレンド名（もらった場合）</label>
-            <select id="friend-${spot.id}" class="form-select">
+            <label class="form-label" for="friend-${spot.pokefuta_id}">フレンド名（もらった場合）</label>
+            <select id="friend-${spot.pokefuta_id}" class="form-select">
               ${friendOptions}
             </select>
           </div>
         </div>
 
         <div class="popup-actions">
-          <button class="btn btn-primary" id="btn-save-${spot.id}" style="width: 100%;">
+          <button class="btn btn-primary" id="btn-save-${spot.pokefuta_id}" style="width: 100%;">
             保存する
           </button>
           ${
@@ -1373,14 +1373,14 @@
       `;
 
       // 保存ボタンのイベント登録
-      const saveBtn = container.querySelector(`#btn-save-${spot.id}`);
+      const saveBtn = container.querySelector(`#btn-save-${spot.pokefuta_id}`);
       saveBtn.addEventListener("click", async () => {
-        const dateVal = container.querySelector(`#date-${spot.id}`).value;
-        const friendVal = container.querySelector(`#friend-${spot.id}`).value;
+        const dateVal = container.querySelector(`#date-${spot.pokefuta_id}`).value;
+        const friendVal = container.querySelector(`#friend-${spot.pokefuta_id}`).value;
         saveBtn.disabled = true;
         saveBtn.textContent = "保存中...";
 
-        await saveRecord(spot.id, dateVal, friendVal);
+        await saveRecord(spot.pokefuta_id, dateVal, friendVal);
         
         saveBtn.textContent = "保存完了!";
         setTimeout(() => {
@@ -1449,7 +1449,7 @@
     function updateAllMarkers() {
       if (!window.pokefutaData) return;
       window.pokefutaData.forEach(spot => {
-        updateSingleMarker(spot.id);
+        updateSingleMarker(spot.pokefuta_id);
       });
     }
 
@@ -1477,7 +1477,7 @@
       let countUnacquired = 0;
 
       allSpots.forEach(spot => {
-        const s = getSpotStatus(spot.id);
+        const s = getSpotStatus(spot.pokefuta_id);
         if (s === "acquired") countAcquired++;
         else if (s === "received") countReceived++;
         else countUnacquired++;
