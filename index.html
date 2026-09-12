@@ -600,6 +600,61 @@
       transform: scale(1) translateY(0);
     }
 
+    /* 認証モーダル拡張スタイル */
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .auth-success {
+      display: none;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: #DCFCE7;
+      color: #15803D;
+      font-size: 0.82rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-main);
+      background: #F1F5F9;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .modal-header {
       display: flex;
       align-items: center;
@@ -793,6 +848,10 @@
       </div>
     </div>
     <div class="header-actions">
+      <div class="user-badge" id="user-display" style="display: none;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span id="user-email-text"></span>
+      </div>
       <button class="btn btn-secondary" id="btn-open-friends">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -802,7 +861,7 @@
         </svg>
         <span>フレンド管理</span>
       </button>
-      <button class="btn btn-secondary btn-sm" id="btn-logout" title="合言葉の再設定・ログアウト">
+      <button class="btn btn-secondary btn-sm" id="btn-logout" title="ログアウト">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
           <polyline points="16 17 21 12 16 7"></polyline>
@@ -853,7 +912,7 @@
     <div id="map"></div>
   </div>
 
-  <!-- 簡易ログインモーダル -->
+  <!-- アカウント認証モーダル（Supabase Auth） -->
   <div class="modal-overlay" id="login-modal">
     <div class="modal-card login-container" id="login-card">
       <div class="login-logo">
@@ -863,17 +922,32 @@
           <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
         </svg>
       </div>
-      <h2 class="modal-title" style="margin-bottom: 6px;">ポケふたラリー</h2>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">合言葉を入力してログインしてください</p>
+      <h2 class="modal-title" style="margin-bottom: 4px; text-align: center;">ポケふたラリー</h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; text-align: center;">自分専用のマップデータを作成・管理</p>
       
+      <!-- ログイン / 新規登録 切り替えタブ -->
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login">ログイン</div>
+        <div class="auth-tab" id="tab-signup">新規アカウント作成</div>
+      </div>
+
       <form id="login-form">
-        <div class="form-group" style="margin-bottom: 16px;">
-          <input type="password" id="password-input" class="form-input" placeholder="合言葉（パスワード）" autocomplete="current-password" required style="text-align: center; font-size: 1rem; padding: 10px;">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="email-input">メールアドレス</label>
+          <input type="email" id="email-input" class="form-input" placeholder="example@family.com" autocomplete="email" required style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 0.95rem;">
-          入場する
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" for="password-input">パスワード</label>
+          <input type="password" id="password-input" class="form-input" placeholder="6文字以上" autocomplete="current-password" required minlength="6" style="font-size: 0.9rem; padding: 9px 12px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-auth-submit" style="width: 100%; padding: 10px; font-size: 0.95rem;">
+          ログインする
         </button>
-        <div class="login-error" id="login-error">合言葉が正しくありません</div>
+        
+        <div class="login-error" id="login-error" style="display: none; margin-top: 12px;"></div>
+        <div class="auth-success" id="auth-success" style="display: none;"></div>
       </form>
     </div>
   </div>
@@ -918,50 +992,50 @@
   <script>
     /**
      * =========================================================================
-     * 設定エリア（パスワード・Supabase接続情報）
+     * 設定エリア（Supabase接続情報）
      * =========================================================================
      */
-    // 簡易ログイン用の合言葉（パスワード）
-    const APP_PASSWORD = "fuwante2025";
-
     // Supabase プロジェクト接続情報
     const SUPABASE_URL = "https://wteyxsmabpubyrsymufh.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0ZXl4c21hYnB1Ynlyc3ltdWZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNjg2MjUsImV4cCI6MjEwNDc0NDYyNX0.fGITZKQ-38K74ML--LRdUK_0-pW-UvTL6j822WOtnw4";
 
     /**
      * =========================================================================
-     * Supabase セットアップ用 SQLクエリ例
+     * Supabase セットアップ用 SQLクエリ（アカウント管理・ユーザー別DB対応）
      * 
-     * Supabaseダッシュボードの「SQL Editor」で以下のSQLを実行してテーブルを作成してください。
+     * Supabaseダッシュボードの「SQL Editor」で以下のSQLを実行してください。
      * 
-     * -- 1. フレンド管理テーブル（名前、トレーナーコード、備考）
+     * -- 1. フレンド管理テーブル作成
      * CREATE TABLE IF NOT EXISTS pokefuta_friends (
      *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+     *   user_id UUID REFERENCES auth.users(id) DEFAULT auth.uid(),
      *   name TEXT NOT NULL,
      *   trainer_code TEXT,
      *   note TEXT,
      *   created_at TIMESTAMPTZ DEFAULT now()
      * );
      * 
-     * -- ※すでに pokefuta_friends テーブルを作成済みの場合は以下でカラムを追加できます：
-     * -- ALTER TABLE pokefuta_friends ADD COLUMN IF NOT EXISTS trainer_code TEXT;
-     * -- ALTER TABLE pokefuta_friends ADD COLUMN IF NOT EXISTS note TEXT;
-     * 
-     * -- 2. ポケふた記録テーブル
+     * -- 2. ポケふた記録テーブル作成
      * CREATE TABLE IF NOT EXISTS pokefuta_records (
      *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-     *   spot_id TEXT UNIQUE NOT NULL,
+     *   user_id UUID REFERENCES auth.users(id) DEFAULT auth.uid(),
+     *   spot_id TEXT NOT NULL,
      *   acquired_date DATE,
      *   friend_name TEXT,
-     *   updated_at TIMESTAMPTZ DEFAULT now()
+     *   updated_at TIMESTAMPTZ DEFAULT now(),
+     *   UNIQUE(user_id, spot_id)
      * );
      * 
-     * -- 3. Row Level Security (RLS) 設定（誰でもアクセス可能にする場合）
+     * -- (すでにテーブルが存在する場合 カラム追加・制約追加用)
+     * -- ALTER TABLE pokefuta_records ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) DEFAULT auth.uid();
+     * -- ALTER TABLE pokefuta_friends ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) DEFAULT auth.uid();
+     * 
+     * -- 3. Row Level Security (RLS) 設定（各ユーザーが自分のデータのみアクセス可）
      * ALTER TABLE pokefuta_friends ENABLE ROW LEVEL SECURITY;
-     * CREATE POLICY "Allow public all friends" ON pokefuta_friends FOR ALL USING (true) WITH CHECK (true);
+     * CREATE POLICY "Users manage own friends" ON pokefuta_friends FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
      * 
      * ALTER TABLE pokefuta_records ENABLE ROW LEVEL SECURITY;
-     * CREATE POLICY "Allow public all records" ON pokefuta_records FOR ALL USING (true) WITH CHECK (true);
+     * CREATE POLICY "Users manage own records" ON pokefuta_records FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
      * 
      * -- 4. リアルタイム同期の有効化
      * ALTER PUBLICATION supabase_realtime ADD TABLE pokefuta_friends;
@@ -977,9 +1051,10 @@
     let currentFilter = "all";
     let supabaseClient = null;
     let isSupabaseConfigured = false;
+    let currentUser = null;
+    let currentAuthMode = "login"; // "login" | "signup"
 
     // LocalStorage キー
-    const STORAGE_KEY_AUTH = "pokefuta_auth_token";
     const STORAGE_KEY_LOCAL_FRIENDS = "pokefuta_local_friends";
     const STORAGE_KEY_LOCAL_RECORDS = "pokefuta_local_records";
 
@@ -987,8 +1062,16 @@
     const loginModal = document.getElementById("login-modal");
     const loginCard = document.getElementById("login-card");
     const loginForm = document.getElementById("login-form");
+    const emailInput = document.getElementById("email-input");
     const passwordInput = document.getElementById("password-input");
     const loginError = document.getElementById("login-error");
+    const authSuccess = document.getElementById("auth-success");
+    const btnAuthSubmit = document.getElementById("btn-auth-submit");
+    const tabLogin = document.getElementById("tab-login");
+    const tabSignup = document.getElementById("tab-signup");
+
+    const userDisplay = document.getElementById("user-display");
+    const userEmailText = document.getElementById("user-email-text");
     const btnLogout = document.getElementById("btn-logout");
 
     const friendModal = document.getElementById("friend-modal");
@@ -1007,41 +1090,149 @@
     const filterButtons = document.querySelectorAll(".filter-btn");
 
     /**
-     * 認証処理
+     * 認証処理（Supabase Auth）
      */
-    function initAuth() {
-      const isAuthed = localStorage.getItem(STORAGE_KEY_AUTH) === "authenticated";
-      if (isAuthed) {
-        loginModal.classList.remove("active");
-        startApp();
+    async function initAuth() {
+      // タブ切り替え処理
+      tabLogin.addEventListener("click", () => {
+        currentAuthMode = "login";
+        tabLogin.classList.add("active");
+        tabSignup.classList.remove("active");
+        btnAuthSubmit.textContent = "ログインする";
+        loginError.style.display = "none";
+        authSuccess.style.display = "none";
+      });
+
+      tabSignup.addEventListener("click", () => {
+        currentAuthMode = "signup";
+        tabSignup.classList.add("active");
+        tabLogin.classList.remove("active");
+        btnAuthSubmit.textContent = "新規アカウントを作成";
+        loginError.style.display = "none";
+        authSuccess.style.display = "none";
+      });
+
+      // フォーム送信処理（ログイン・新規登録）
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!email || !password) return;
+
+        btnAuthSubmit.disabled = true;
+        loginError.style.display = "none";
+        authSuccess.style.display = "none";
+
+        if (currentAuthMode === "login") {
+          btnAuthSubmit.textContent = "ログイン中...";
+          if (isSupabaseConfigured && supabaseClient) {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+              email: email,
+              password: password
+            });
+
+            if (error) {
+              showAuthError("ログインエラー: " + (error.message === "Invalid login credentials" ? "メールアドレスまたはパスワードが違います" : error.message));
+              btnAuthSubmit.disabled = false;
+              btnAuthSubmit.textContent = "ログインする";
+            } else {
+              handleAuthSuccess(data.user);
+            }
+          } else {
+            showAuthError("Supabaseが接続されていません");
+            btnAuthSubmit.disabled = false;
+            btnAuthSubmit.textContent = "ログインする";
+          }
+        } else {
+          // 新規登録
+          btnAuthSubmit.textContent = "アカウント作成中...";
+          if (isSupabaseConfigured && supabaseClient) {
+            const { data, error } = await supabaseClient.auth.signUp({
+              email: email,
+              password: password
+            });
+
+            if (error) {
+              showAuthError("登録エラー: " + error.message);
+              btnAuthSubmit.disabled = false;
+              btnAuthSubmit.textContent = "新規アカウントを作成";
+            } else if (data.user) {
+              if (data.session) {
+                // 自動ログイン成功
+                handleAuthSuccess(data.user);
+              } else {
+                // メール確認待ちな場合
+                authSuccess.textContent = "アカウントを作成しました！メールが届いた場合は確認リンクをクリックしてログインしてください。";
+                authSuccess.style.display = "block";
+                btnAuthSubmit.disabled = false;
+                btnAuthSubmit.textContent = "新規アカウントを作成";
+              }
+            }
+          } else {
+            showAuthError("Supabaseが接続されていません");
+            btnAuthSubmit.disabled = false;
+            btnAuthSubmit.textContent = "新規アカウントを作成";
+          }
+        }
+      });
+
+      // ログアウト処理
+      btnLogout.addEventListener("click", async () => {
+        if (confirm("ログアウトしますか？")) {
+          if (isSupabaseConfigured && supabaseClient) {
+            await supabaseClient.auth.signOut();
+          }
+          currentUser = null;
+          userDisplay.style.display = "none";
+          loginModal.classList.add("active");
+        }
+      });
+
+      // 初回セッションチェック＆変更監視
+      if (isSupabaseConfigured && supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+          handleAuthSuccess(session.user);
+        } else {
+          loginModal.classList.add("active");
+        }
+
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+          if (event === "SIGNED_IN" && session && session.user) {
+            handleAuthSuccess(session.user);
+          } else if (event === "SIGNED_OUT") {
+            currentUser = null;
+            userDisplay.style.display = "none";
+            loginModal.classList.add("active");
+          }
+        });
       } else {
         loginModal.classList.add("active");
-        passwordInput.focus();
       }
+    }
 
-      loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const inputVal = passwordInput.value.trim();
-        if (inputVal === APP_PASSWORD) {
-          localStorage.setItem(STORAGE_KEY_AUTH, "authenticated");
-          loginError.style.display = "none";
-          loginModal.classList.remove("active");
-          startApp();
-        } else {
-          loginError.style.display = "block";
-          loginCard.classList.remove("shake");
-          void loginCard.offsetWidth; // リフロー発生
-          loginCard.classList.add("shake");
-          passwordInput.select();
-        }
-      });
+    function showAuthError(msg) {
+      loginError.textContent = msg;
+      loginError.style.display = "block";
+      loginCard.classList.remove("shake");
+      void loginCard.offsetWidth;
+      loginCard.classList.add("shake");
+    }
 
-      btnLogout.addEventListener("click", () => {
-        if (confirm("ログアウトして合言葉入力画面に戻りますか？")) {
-          localStorage.removeItem(STORAGE_KEY_AUTH);
-          location.reload();
-        }
-      });
+    function handleAuthSuccess(user) {
+      currentUser = user;
+      userEmailText.textContent = user.email || "ユーザー";
+      userDisplay.style.display = "inline-flex";
+      loginModal.classList.remove("active");
+      loginError.style.display = "none";
+      authSuccess.style.display = "none";
+
+      if (!map) {
+        startApp();
+      } else {
+        loadData();
+      }
     }
 
     /**
@@ -1079,24 +1270,29 @@
      * データのロード（Supabase または LocalStorage）
      */
     async function loadData() {
-      if (isSupabaseConfigured && supabaseClient) {
+      if (isSupabaseConfigured && supabaseClient && currentUser) {
         try {
-          // フレンド一覧取得
-          const { data: friendsData, error: fError } = await supabaseClient
+          // フレンド一覧取得 (RLSまたはuser_id指定)
+          let queryFriends = supabaseClient
             .from("pokefuta_friends")
             .select("*")
             .order("created_at", { ascending: true });
+          
+          const { data: friendsData, error: fError } = await queryFriends;
 
           if (fError) {
             console.error("Supabaseフレンド取得エラー:", fError);
           } else if (friendsData) {
-            friends = friendsData;
+            // 他ユーザーのデータがRLS未設定で返ってくる場合のクライアントフィルタ
+            friends = friendsData.filter(f => !f.user_id || f.user_id === currentUser.id);
           }
 
           // 記録データ取得
-          const { data: recordsData, error: rError } = await supabaseClient
+          let queryRecords = supabaseClient
             .from("pokefuta_records")
             .select("*");
+
+          const { data: recordsData, error: rError } = await queryRecords;
 
           if (rError) {
             console.error("Supabase記録取得エラー:", rError);
@@ -1107,10 +1303,12 @@
           } else if (recordsData) {
             records = {};
             recordsData.forEach(item => {
-              records[item.spot_id] = {
-                acquired_date: item.acquired_date || "",
-                friend_name: item.friend_name || ""
-              };
+              if (!item.user_id || item.user_id === currentUser.id) {
+                records[item.spot_id] = {
+                  acquired_date: item.acquired_date || "",
+                  friend_name: item.friend_name || ""
+                };
+              }
             });
             syncText.textContent = "Supabase 同期中";
             syncDot.classList.remove("offline");
@@ -1419,20 +1617,32 @@
 
       let success = true;
 
-      if (isSupabaseConfigured && supabaseClient) {
+      if (isSupabaseConfigured && supabaseClient && currentUser) {
         try {
-          const { error } = await supabaseClient
+          const payload = {
+            user_id: currentUser.id,
+            spot_id: spotId,
+            acquired_date: acquiredDate || null,
+            friend_name: friendName || null,
+            updated_at: new Date().toISOString()
+          };
+
+          // onConflictは user_id,spot_id または spot_id に対応
+          let { error } = await supabaseClient
             .from("pokefuta_records")
-            .upsert({
-              spot_id: spotId,
-              acquired_date: acquiredDate || null,
-              friend_name: friendName || null,
-              updated_at: new Date().toISOString()
-            }, { onConflict: "spot_id" });
+            .upsert(payload, { onConflict: "user_id,spot_id" });
+
+          if (error && error.message && error.message.includes("onConflict")) {
+            // 制約名がspot_id単体の場合のフォールバック
+            const res = await supabaseClient
+              .from("pokefuta_records")
+              .upsert(payload, { onConflict: "spot_id" });
+            error = res.error;
+          }
 
           if (error) {
             console.error("Supabase保存エラー:", error);
-            alert("Supabaseへのデータ保存に失敗しました:\n" + (error.message || JSON.stringify(error)) + "\n\n※Supabaseダッシュボードで pokefuta_records テーブルの spot_id に UNIQUE 制約があるか、および RLS ポリシーが許可されているか確認してください。");
+            alert("Supabaseへのデータ保存に失敗しました:\n" + (error.message || JSON.stringify(error)) + "\n\n※Supabaseダッシュボードで pokefuta_records テーブルの RLS ポリシーが許可されているか確認してください。");
             success = false;
           }
         } catch (err) {
@@ -1588,13 +1798,18 @@
 
       if (isSupabaseConfigured && supabaseClient) {
         try {
+          const insertPayload = {
+            name: name,
+            trainer_code: trainerCode || null,
+            note: note || null
+          };
+          if (currentUser) {
+            insertPayload.user_id = currentUser.id;
+          }
+
           const { data, error } = await supabaseClient
             .from("pokefuta_friends")
-            .insert([{
-              name: name,
-              trainer_code: trainerCode || null,
-              note: note || null
-            }])
+            .insert([insertPayload])
             .select();
 
           if (!error && data && data.length > 0) {
