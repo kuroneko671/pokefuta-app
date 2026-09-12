@@ -925,9 +925,8 @@
     const APP_PASSWORD = "fuwante2025";
 
     // Supabase プロジェクト接続情報
-    // ※Supabaseダッシュボードの Project Settings -> API より取得した値を設定してください。
-    const SUPABASE_URL = "https://your-project.supabase.co";
-    const SUPABASE_KEY = "your-anon-key";
+    const SUPABASE_URL = "https://wteyxsmapbubyrsymufh.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0ZXl4c21hYnB1Ynlyc3ltdWZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNjg2MjUsImV4cCI6MjEwNDc0NDYyNX0.fGITZKQ-38K74ML--LRdUK_0-pW-UvTL6j822WOtnw4";
 
     /**
      * =========================================================================
@@ -1054,6 +1053,7 @@
         !SUPABASE_URL.includes("your-project") &&
         SUPABASE_KEY &&
         !SUPABASE_KEY.includes("your-anon-key") &&
+        !SUPABASE_KEY.includes("ここにコピーした") &&
         window.supabase
       ) {
         try {
@@ -1087,7 +1087,9 @@
             .select("*")
             .order("created_at", { ascending: true });
 
-          if (!fError && friendsData) {
+          if (fError) {
+            console.error("Supabaseフレンド取得エラー:", fError);
+          } else if (friendsData) {
             friends = friendsData;
           }
 
@@ -1096,7 +1098,13 @@
             .from("pokefuta_records")
             .select("*");
 
-          if (!rError && recordsData) {
+          if (rError) {
+            console.error("Supabase記録取得エラー:", rError);
+            syncText.textContent = "Supabaseエラー(RLS等)";
+            syncDot.classList.add("offline");
+            alert("Supabaseからのデータ取得に失敗しました:\n" + rError.message + "\n\nRLS設定(Row Level Security Policy)を確認してください。");
+            loadLocalStorageData();
+          } else if (recordsData) {
             records = {};
             recordsData.forEach(item => {
               records[item.spot_id] = {
@@ -1104,9 +1112,13 @@
                 friend_name: item.friend_name || ""
               };
             });
+            syncText.textContent = "Supabase 同期中";
+            syncDot.classList.remove("offline");
           }
         } catch (e) {
-          console.error("Supabaseデータ取得エラー。ローカルデータを参照します:", e);
+          console.error("Supabaseデータ取得通信エラー:", e);
+          syncText.textContent = "通信エラー(ローカル参照)";
+          syncDot.classList.add("offline");
           loadLocalStorageData();
         }
       } else {
@@ -1380,12 +1392,17 @@
         saveBtn.disabled = true;
         saveBtn.textContent = "保存中...";
 
-        await saveRecord(spot.pokefuta_id, dateVal, friendVal);
+        const success = await saveRecord(spot.pokefuta_id, dateVal, friendVal);
         
-        saveBtn.textContent = "保存完了!";
-        setTimeout(() => {
-          if (map) map.closePopup();
-        }, 350);
+        if (success) {
+          saveBtn.textContent = "保存完了!";
+          setTimeout(() => {
+            if (map) map.closePopup();
+          }, 350);
+        } else {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "保存失敗(再試行)";
+        }
       });
 
       return container;
@@ -1400,6 +1417,8 @@
         friend_name: friendName
       };
 
+      let success = true;
+
       if (isSupabaseConfigured && supabaseClient) {
         try {
           const { error } = await supabaseClient
@@ -1411,17 +1430,24 @@
               updated_at: new Date().toISOString()
             }, { onConflict: "spot_id" });
 
-          if (error) throw error;
+          if (error) {
+            console.error("Supabase保存エラー:", error);
+            alert("Supabaseへのデータ保存に失敗しました:\n" + (error.message || JSON.stringify(error)) + "\n\n※Supabaseダッシュボードで pokefuta_records テーブルの spot_id に UNIQUE 制約があるか、および RLS ポリシーが許可されているか確認してください。");
+            success = false;
+          }
         } catch (err) {
-          console.error("Supabase保存エラー。LocalStorageに保存します:", err);
-          saveToLocalStorage();
+          console.error("Supabase通信エラー:", err);
+          alert("Supabase通信エラーが発生しました:\n" + err.message);
+          success = false;
         }
-      } else {
-        saveToLocalStorage();
       }
 
+      // ローカルストレージにもバックアップ保存
+      saveToLocalStorage();
       updateSingleMarker(spotId);
       updateStatistics();
+
+      return success;
     }
 
     function saveToLocalStorage() {
