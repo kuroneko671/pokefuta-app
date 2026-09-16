@@ -29,6 +29,9 @@ while ($listener.IsListening) {
         } else {
             $res.ContentType = "application/octet-stream"
         }
+        $res.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate")
+        $res.Headers.Add("Pragma", "no-cache")
+        $res.Headers.Add("Expires", "0")
         $res.ContentLength64 = $bytes.Length
         $res.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {

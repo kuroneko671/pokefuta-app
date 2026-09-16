@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>ポケふた スタンプラリー管理アプリ</title>
 
   <!-- Google Fonts -->
@@ -813,17 +816,33 @@
     /* レスポンシブ対応 */
     @media (max-width: 640px) {
       header {
-        padding: 8px 12px;
+        padding: 6px 8px;
+      }
+      .brand-sub {
+        display: none;
       }
       .brand-title {
-        font-size: 0.95rem;
+        font-size: 0.88rem;
+      }
+      .user-badge {
+        max-width: 80px;
+        padding: 3px 6px;
+        font-size: 0.68rem;
+      }
+      .user-badge span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .header-actions {
+        gap: 4px;
       }
       .btn {
-        padding: 6px 10px;
-        font-size: 0.78rem;
+        padding: 5px 8px;
+        font-size: 0.75rem;
       }
       .top-panel {
-        padding: 6px 12px;
+        padding: 6px 8px;
       }
       .leaflet-popup-content {
         min-width: 250px;
@@ -861,6 +880,12 @@
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
         <span>フレンド管理</span>
+      </button>
+      <button class="btn btn-secondary btn-sm" id="btn-open-password" title="パスワード変更" style="display: none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
       </button>
       <button class="btn btn-secondary btn-sm" id="btn-logout" title="ログアウト">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -954,6 +979,12 @@
         
         <div class="login-error" id="login-error" style="display: none; margin-top: 12px;"></div>
         <div class="auth-success" id="auth-success" style="display: none;"></div>
+
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border); text-align: center;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-open-password-login" style="width: 100%; font-size: 0.82rem; padding: 8px;">
+            🔑 パスワードを変更する
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -989,6 +1020,38 @@
       <ul class="friend-list" id="friend-list-container">
         <!-- フレンド一覧がここに動的挿入されます -->
       </ul>
+
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border); text-align: center;">
+        <button class="btn btn-secondary btn-sm" id="btn-open-password-sub" style="width: 100%;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          パスワードを変更する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- パスワード変更モーダル -->
+  <div class="modal-overlay" id="password-modal">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 class="modal-title">パスワード変更</h3>
+        <button class="modal-close" id="btn-close-password">&times;</button>
+      </div>
+      <form id="password-change-form" style="margin-top: 12px;">
+        <div class="form-group">
+          <label class="form-label" for="input-new-password">新しいパスワード</label>
+          <input type="password" class="form-input" id="input-new-password" placeholder="6文字以上を入力" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-confirm-password">新しいパスワード（確認）</label>
+          <input type="password" class="form-input" id="input-confirm-password" placeholder="もう一度入力" required minlength="6">
+        </div>
+        <div id="password-error" class="auth-error" style="display: none; margin-bottom: 12px;"></div>
+        <div id="password-success" class="auth-success" style="display: none; margin-bottom: 12px; color: #10B981; background: #ECFDF5; padding: 10px; border-radius: 8px; font-size: 0.85rem;"></div>
+        <button type="submit" class="btn btn-primary" id="btn-password-submit" style="width: 100%; margin-top: 8px;">
+          パスワードを変更する
+        </button>
+      </form>
     </div>
   </div>
 
@@ -1083,7 +1146,17 @@
 
     const userDisplay = document.getElementById("user-display");
     const userEmailText = document.getElementById("user-email-text");
+    const btnOpenPassword = document.getElementById("btn-open-password");
     const btnLogout = document.getElementById("btn-logout");
+
+    const passwordModal = document.getElementById("password-modal");
+    const btnClosePassword = document.getElementById("btn-close-password");
+    const passwordChangeForm = document.getElementById("password-change-form");
+    const inputNewPassword = document.getElementById("input-new-password");
+    const inputConfirmPassword = document.getElementById("input-confirm-password");
+    const passwordError = document.getElementById("password-error");
+    const passwordSuccess = document.getElementById("password-success");
+    const btnPasswordSubmit = document.getElementById("btn-password-submit");
 
     const friendModal = document.getElementById("friend-modal");
     const btnOpenFriends = document.getElementById("btn-open-friends");
@@ -1134,83 +1207,114 @@
         const password = passwordInput.value.trim();
 
         if (!email || !password) return;
+        if (btnAuthSubmit.disabled) return;
 
         btnAuthSubmit.disabled = true;
         loginError.style.display = "none";
         authSuccess.style.display = "none";
 
-        if (currentAuthMode === "login") {
-          btnAuthSubmit.textContent = "ログイン中...";
-          if (isSupabaseConfigured && supabaseClient) {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-              email: email,
-              password: password
-            });
+        const originalMode = currentAuthMode;
+        btnAuthSubmit.textContent = originalMode === "login" ? "ログイン中..." : "アカウント作成中...";
 
-            if (error) {
-              showAuthError("ログインエラー: " + (error.message === "Invalid login credentials" ? "メールアドレスまたはパスワードが違います" : error.message));
-              btnAuthSubmit.disabled = false;
-              btnAuthSubmit.textContent = "ログインする";
-            } else {
-              handleAuthSuccess(data.user);
-            }
-          } else {
-            showAuthError("Supabaseが接続されていません");
-            btnAuthSubmit.disabled = false;
-            btnAuthSubmit.textContent = "ログインする";
-          }
-        } else {
-          // 新規登録時の家族合言葉チェック
-          const inputSecret = secretInput.value.trim();
-          if (inputSecret !== FAMILY_SECRET_CODE) {
-            showAuthError("家族共通の合言葉が正しくありません");
-            btnAuthSubmit.disabled = false;
-            btnAuthSubmit.textContent = "新規アカウントを作成";
-            return;
-          }
+        try {
+          if (originalMode === "login") {
+            if (isSupabaseConfigured && supabaseClient) {
+              const result = await Promise.race([
+                supabaseClient.auth.signInWithPassword({ email, password }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("通信タイムアウトが発生しました。接続を確認してください。")), 10000))
+              ]);
 
-          // 新規登録
-          btnAuthSubmit.textContent = "アカウント作成中...";
-          if (isSupabaseConfigured && supabaseClient) {
-            const { data, error } = await supabaseClient.auth.signUp({
-              email: email,
-              password: password
-            });
+              const { data, error } = result || {};
 
-            if (error) {
-              showAuthError("登録エラー: " + error.message);
-              btnAuthSubmit.disabled = false;
-              btnAuthSubmit.textContent = "新規アカウントを作成";
-            } else if (data.user) {
-              if (data.session) {
-                // 自動ログイン成功
+              if (error) {
+                showAuthError("ログインエラー: " + (error.message === "Invalid login credentials" ? "メールアドレスまたはパスワードが違います" : error.message));
+              } else if (data && data.user) {
                 handleAuthSuccess(data.user);
-              } else {
-                // メール確認待ちな場合
-                authSuccess.textContent = "アカウントを作成しました！メールが届いた場合は確認リンクをクリックしてログインしてください。";
-                authSuccess.style.display = "block";
-                btnAuthSubmit.disabled = false;
-                btnAuthSubmit.textContent = "新規アカウントを作成";
               }
+            } else {
+              showAuthError("Supabaseが接続されていません");
             }
           } else {
-            showAuthError("Supabaseが接続されていません");
-            btnAuthSubmit.disabled = false;
-            btnAuthSubmit.textContent = "新規アカウントを作成";
+            // 新規登録時の家族合言葉チェック
+            const inputSecret = secretInput.value.trim();
+            if (inputSecret !== FAMILY_SECRET_CODE) {
+              showAuthError("家族共通の合言葉が正しくありません");
+              return;
+            }
+
+            if (isSupabaseConfigured && supabaseClient) {
+              const result = await Promise.race([
+                supabaseClient.auth.signUp({ email, password }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("通信タイムアウトが発生しました。接続を確認してください。")), 10000))
+              ]);
+
+              const { data, error } = result || {};
+
+              if (error) {
+                showAuthError("登録エラー: " + error.message);
+              } else if (data && data.user) {
+                if (data.session) {
+                  handleAuthSuccess(data.user);
+                } else {
+                  authSuccess.textContent = "アカウントを作成しました！メールをご確認の上ログインしてください。";
+                  authSuccess.style.display = "block";
+                }
+              }
+            } else {
+              showAuthError("Supabaseが接続されていません");
+            }
           }
+        } catch (err) {
+          console.error("認証処理通信例外:", err);
+          showAuthError(err.message || "通信エラーが発生しました");
+        } finally {
+          // 通信結果や成否に関わらず、ボタン状態を常に安全に復元
+          btnAuthSubmit.disabled = false;
+          btnAuthSubmit.textContent = currentAuthMode === "login" ? "ログインする" : "新規アカウントを作成";
         }
       });
 
       // ログアウト処理
       btnLogout.addEventListener("click", async () => {
-        if (confirm("ログアウトしますか？")) {
-          if (isSupabaseConfigured && supabaseClient) {
-            await supabaseClient.auth.signOut();
-          }
-          currentUser = null;
-          userDisplay.style.display = "none";
-          loginModal.classList.add("active");
+        if (document.activeElement) {
+          document.activeElement.blur();
         }
+
+        // ログアウトボタン・送信ボタンの連打防止
+        btnAuthSubmit.disabled = true;
+        btnAuthSubmit.textContent = "処理中...";
+
+        if (isSupabaseConfigured && supabaseClient) {
+          try {
+            // Supabaseのログアウト通信を完了させる（最長800ms待ち）
+            await Promise.race([
+              supabaseClient.auth.signOut(),
+              new Promise(resolve => setTimeout(resolve, 800))
+            ]);
+          } catch (e) {
+            console.error("Supabaseログアウトエラー:", e);
+          }
+        }
+
+        // ページ更新時と同様に、ブラウザ内のSupabase認証セッションキャッシュを明示的に削除
+        try {
+          const keysToRemove = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.includes("auth-token") || key.startsWith("sb-"))) {
+              // 接続設定（pokefuta_supabase_url / anon_key）以外のアカウントセッションキーを削除
+              if (key !== "pokefuta_supabase_url" && key !== "pokefuta_supabase_anon_key") {
+                keysToRemove.push(key);
+              }
+            }
+          }
+          keysToRemove.forEach(k => localStorage.removeItem(k));
+        } catch (e) {
+          console.error("ローカルセッション削除エラー:", e);
+        }
+
+        // 画面およびフォーム状態を完全ログアウト状態へ更新
+        handleSignOut();
       });
 
       // 初回セッションチェック＆変更監視
@@ -1219,20 +1323,18 @@
         if (session && session.user) {
           handleAuthSuccess(session.user);
         } else {
-          loginModal.classList.add("active");
+          handleSignOut();
         }
 
         supabaseClient.auth.onAuthStateChange((event, session) => {
           if (event === "SIGNED_IN" && session && session.user) {
             handleAuthSuccess(session.user);
           } else if (event === "SIGNED_OUT") {
-            currentUser = null;
-            userDisplay.style.display = "none";
-            loginModal.classList.add("active");
+            handleSignOut();
           }
         });
       } else {
-        loginModal.classList.add("active");
+        handleSignOut();
       }
     }
 
@@ -1244,20 +1346,138 @@
       loginCard.classList.add("shake");
     }
 
+    function resetAuthForm() {
+      btnAuthSubmit.disabled = false;
+      btnAuthSubmit.textContent = currentAuthMode === "login" ? "ログインする" : "新規アカウントを作成";
+      emailInput.value = "";
+      passwordInput.value = "";
+      secretInput.value = "";
+      loginError.style.display = "none";
+      authSuccess.style.display = "none";
+    }
+
+    function handleSignOut() {
+      currentUser = null;
+      teardownRealtimeSubscription();
+      userDisplay.style.display = "none";
+      btnOpenPassword.style.display = "none";
+      passwordModal.classList.remove("active");
+      records = {};
+      friends = [];
+      if (map) {
+        updateAllMarkers();
+        updateStatistics();
+        renderFriendList();
+      }
+      resetAuthForm();
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
+      loginModal.classList.add("active");
+      loginCard.scrollTop = 0;
+    }
+
     function handleAuthSuccess(user) {
       currentUser = user;
       userEmailText.textContent = user.email || "ユーザー";
       userDisplay.style.display = "inline-flex";
+      btnOpenPassword.style.display = "inline-flex";
       loginModal.classList.remove("active");
-      loginError.style.display = "none";
-      authSuccess.style.display = "none";
+      resetAuthForm();
 
+      setupRealtimeSubscription();
       if (!map) {
         startApp();
       } else {
         loadData();
       }
     }
+
+    const openPasswordModal = () => {
+      inputNewPassword.value = "";
+      inputConfirmPassword.value = "";
+      passwordError.style.display = "none";
+      passwordSuccess.style.display = "none";
+      btnPasswordSubmit.disabled = false;
+      btnPasswordSubmit.textContent = "パスワードを変更する";
+      passwordModal.classList.add("active");
+    };
+
+    // パスワード変更モーダルの開閉と処理
+    btnOpenPassword.addEventListener("click", openPasswordModal);
+
+    const btnOpenPasswordSub = document.getElementById("btn-open-password-sub");
+    if (btnOpenPasswordSub) {
+      btnOpenPasswordSub.addEventListener("click", () => {
+        friendModal.classList.remove("active");
+        openPasswordModal();
+      });
+    }
+
+    const btnOpenPasswordLogin = document.getElementById("btn-open-password-login");
+    if (btnOpenPasswordLogin) {
+      btnOpenPasswordLogin.addEventListener("click", () => {
+        loginModal.classList.remove("active");
+        openPasswordModal();
+      });
+    }
+
+    btnClosePassword.addEventListener("click", () => {
+      passwordModal.classList.remove("active");
+    });
+
+    passwordModal.addEventListener("click", (e) => {
+      if (e.target === passwordModal) {
+        passwordModal.classList.remove("active");
+      }
+    });
+
+    passwordChangeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPass = inputNewPassword.value.trim();
+      const confirmPass = inputConfirmPassword.value.trim();
+
+      if (newPass !== confirmPass) {
+        passwordError.textContent = "新しいパスワードが一致しません";
+        passwordError.style.display = "block";
+        passwordSuccess.style.display = "none";
+        return;
+      }
+
+      btnPasswordSubmit.disabled = true;
+      btnPasswordSubmit.textContent = "変更中...";
+      passwordError.style.display = "none";
+      passwordSuccess.style.display = "none";
+
+      try {
+        if (isSupabaseConfigured && supabaseClient) {
+          const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
+          if (error) {
+            passwordError.textContent = "変更エラー: " + error.message;
+            passwordError.style.display = "block";
+          } else {
+            passwordSuccess.textContent = "パスワードを正常に変更しました！";
+            passwordSuccess.style.display = "block";
+            inputNewPassword.value = "";
+            inputConfirmPassword.value = "";
+            setTimeout(() => {
+              passwordModal.classList.remove("active");
+              passwordSuccess.style.display = "none";
+            }, 1500);
+          }
+        } else {
+          passwordError.textContent = "Supabaseが接続されていません";
+          passwordError.style.display = "block";
+        }
+      } catch (err) {
+        console.error("パスワード変更例外:", err);
+        passwordError.textContent = "通信エラーが発生しました: " + err.message;
+        passwordError.style.display = "block";
+      } finally {
+        btnPasswordSubmit.disabled = false;
+        btnPasswordSubmit.textContent = "パスワードを変更する";
+      }
+    });
 
     /**
      * Supabaseクライアントの初期化
@@ -1276,7 +1496,6 @@
           isSupabaseConfigured = true;
           syncDot.classList.remove("offline");
           syncText.textContent = "Supabase 接続中";
-          setupRealtimeSubscription();
         } catch (err) {
           console.warn("Supabase初期化エラー:", err);
           isSupabaseConfigured = false;
@@ -1296,25 +1515,24 @@
     async function loadData() {
       if (isSupabaseConfigured && supabaseClient && currentUser) {
         try {
-          // フレンド一覧取得 (RLSまたはuser_id指定)
-          let queryFriends = supabaseClient
+          // フレンド一覧取得 (user_idで明示的にフィルタ)
+          const { data: friendsData, error: fError } = await supabaseClient
             .from("pokefuta_friends")
             .select("*")
+            .eq("user_id", currentUser.id)
             .order("created_at", { ascending: true });
-          
-          const { data: friendsData, error: fError } = await queryFriends;
 
           if (fError) {
             console.error("Supabaseフレンド取得エラー:", fError);
           } else if (friendsData) {
-            // 他ユーザーのデータがRLS未設定で返ってくる場合のクライアントフィルタ
-            friends = friendsData.filter(f => !f.user_id || f.user_id === currentUser.id);
+            friends = friendsData;
           }
 
-          // 記録データ取得
+          // 記録データ取得 (user_idで明示的にフィルタ)
           let queryRecords = supabaseClient
             .from("pokefuta_records")
-            .select("*");
+            .select("*")
+            .eq("user_id", currentUser.id);
 
           const { data: recordsData, error: rError } = await queryRecords;
 
@@ -1327,12 +1545,10 @@
           } else if (recordsData) {
             records = {};
             recordsData.forEach(item => {
-              if (!item.user_id || item.user_id === currentUser.id) {
-                records[item.spot_id] = {
-                  acquired_date: item.acquired_date || "",
-                  friend_name: item.friend_name || ""
-                };
-              }
+              records[item.spot_id] = {
+                acquired_date: item.acquired_date || "",
+                friend_name: item.friend_name || ""
+              };
             });
             syncText.textContent = "Supabase 同期中";
             syncDot.classList.remove("offline");
@@ -1372,12 +1588,21 @@
     /**
      * Supabase リアルタイム監視のセットアップ
      */
-    function setupRealtimeSubscription() {
-      if (!supabaseClient) return;
+    let realtimeChannel = null;
 
-      supabaseClient
-        .channel("pokefuta_changes")
-        .on("postgres_changes", { event: "*", schema: "public", table: "pokefuta_records" }, (payload) => {
+    function setupRealtimeSubscription() {
+      if (!supabaseClient || !currentUser) return;
+      // 既存の購読があれば先に解除
+      teardownRealtimeSubscription();
+
+      realtimeChannel = supabaseClient
+        .channel("pokefuta_changes_" + currentUser.id)
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "pokefuta_records",
+          filter: `user_id=eq.${currentUser.id}`
+        }, (payload) => {
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
             const row = payload.new;
             records[row.spot_id] = {
@@ -1395,15 +1620,31 @@
             }
           }
         })
-        .on("postgres_changes", { event: "*", schema: "public", table: "pokefuta_friends" }, () => {
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "pokefuta_friends",
+          filter: `user_id=eq.${currentUser.id}`
+        }, () => {
           refreshFriendsFromSupabase();
         })
         .subscribe();
     }
 
+    function teardownRealtimeSubscription() {
+      if (realtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+    }
+
     async function refreshFriendsFromSupabase() {
-      if (!supabaseClient) return;
-      const { data } = await supabaseClient.from("pokefuta_friends").select("*").order("created_at", { ascending: true });
+      if (!supabaseClient || !currentUser) return;
+      const { data } = await supabaseClient
+        .from("pokefuta_friends")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: true });
       if (data) {
         friends = data;
         renderFriendList();
