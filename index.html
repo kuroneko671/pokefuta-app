@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,15 +8,18 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>ポケふた スタンプラリー管理アプリ</title>
+  <title>ポケふたスタンプ管理アプリ</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    rel="stylesheet">
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -37,9 +41,9 @@
       --text-main: #1E293B;
       --text-muted: #64748B;
       --border: #E2E8F0;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
-      --shadow-lg: 0 16px 36px rgba(0,0,0,0.18);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.18);
       --radius-sm: 10px;
       --radius-md: 16px;
       --radius-lg: 24px;
@@ -244,6 +248,7 @@
       padding-bottom: 2px;
       scrollbar-width: none;
     }
+
     .filters::-webkit-scrollbar {
       display: none;
     }
@@ -335,7 +340,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
       border: 2px solid #FFFFFF;
     }
 
@@ -365,7 +370,7 @@
       border-radius: var(--radius-md);
       overflow: hidden;
       box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(0,0,0,0.06);
+      border: 1px solid rgba(0, 0, 0, 0.06);
     }
 
     .leaflet-popup-content {
@@ -513,6 +518,40 @@
       margin-bottom: 14px;
     }
 
+    .record-section {
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .record-section-acquired {
+      background: #FFF7ED;
+      border: 1px solid #FFEDD5;
+    }
+
+    .record-section-received {
+      background: #F0F9FF;
+      border: 1px solid #E0F2FE;
+    }
+
+    .record-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .record-section-acquired .record-section-title {
+      color: #C2410C;
+    }
+
+    .record-section-received .record-section-title {
+      color: #0369A1;
+    }
+
     .form-group {
       display: flex;
       flex-direction: column;
@@ -525,7 +564,8 @@
       color: var(--text-main);
     }
 
-    .form-input, .form-select {
+    .form-input,
+    .form-select {
       width: 100%;
       padding: 8px 10px;
       border-radius: var(--radius-sm);
@@ -537,7 +577,8 @@
       font-family: inherit;
     }
 
-    .form-input:focus, .form-select:focus {
+    .form-input:focus,
+    .form-select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
     }
@@ -807,10 +848,27 @@
     }
 
     @keyframes shake {
-      10%, 90% { transform: translate3d(-2px, 0, 0); }
-      20%, 80% { transform: translate3d(4px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-      40%, 60% { transform: translate3d(6px, 0, 0); }
+
+      10%,
+      90% {
+        transform: translate3d(-2px, 0, 0);
+      }
+
+      20%,
+      80% {
+        transform: translate3d(4px, 0, 0);
+      }
+
+      30%,
+      50%,
+      70% {
+        transform: translate3d(-6px, 0, 0);
+      }
+
+      40%,
+      60% {
+        transform: translate3d(6px, 0, 0);
+      }
     }
 
     /* レスポンシブ対応 */
@@ -818,62 +876,76 @@
       header {
         padding: 6px 8px;
       }
+
       .brand-sub {
         display: none;
       }
+
       .brand-title {
         font-size: 0.88rem;
       }
+
       .user-badge {
         max-width: 80px;
         padding: 3px 6px;
         font-size: 0.68rem;
       }
+
       .user-badge span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
       .header-actions {
         gap: 4px;
       }
+
       .btn {
         padding: 5px 8px;
         font-size: 0.75rem;
       }
+
       .top-panel {
         padding: 6px 8px;
       }
+
       .leaflet-popup-content {
         min-width: 250px;
       }
     }
   </style>
 </head>
+
 <body>
 
   <!-- アプリヘッダー -->
   <header>
     <div class="brand">
       <div class="brand-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="2" y1="12" x2="22" y2="12"></line>
           <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
         </svg>
       </div>
       <div>
-        <div class="brand-title">ポケふたラリー</div>
-        <div class="brand-sub">ポケモンマンホール管理</div>
+        <div class="brand-title">ポケスタ</div>
+        <div class="brand-sub">ポケふたスタンプ管理アプリ</div>
       </div>
     </div>
     <div class="header-actions">
       <div class="user-badge" id="user-display" style="display: none;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
         <span id="user-email-text"></span>
       </div>
       <button class="btn btn-secondary" id="btn-open-friends">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -882,13 +954,15 @@
         <span>フレンド管理</span>
       </button>
       <button class="btn btn-secondary btn-sm" id="btn-open-password" title="パスワード変更" style="display: none;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
       </button>
       <button class="btn btn-secondary btn-sm" id="btn-logout" title="ログアウト">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
           <polyline points="16 17 21 12 16 7"></polyline>
           <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -942,15 +1016,17 @@
   <div class="modal-overlay" id="login-modal">
     <div class="modal-card login-container" id="login-card">
       <div class="login-logo">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="2" y1="12" x2="22" y2="12"></line>
           <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
         </svg>
       </div>
       <h2 class="modal-title" style="margin-bottom: 4px; text-align: center;">ポケふたラリー</h2>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; text-align: center;">自分専用のマップデータを作成・管理</p>
-      
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; text-align: center;">
+        自分専用のマップデータを作成・管理</p>
+
       <!-- ログイン / 新規登録 切り替えタブ -->
       <div class="auth-tabs">
         <div class="auth-tab active" id="tab-login">ログイン</div>
@@ -960,28 +1036,33 @@
       <form id="login-form">
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label" for="email-input">メールアドレス</label>
-          <input type="email" id="email-input" class="form-input" placeholder="example@family.com" autocomplete="email" required style="font-size: 0.9rem; padding: 9px 12px;">
+          <input type="email" id="email-input" class="form-input" placeholder="example@family.com" autocomplete="email"
+            required style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
 
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label" for="password-input">パスワード</label>
-          <input type="password" id="password-input" class="form-input" placeholder="6文字以上" autocomplete="current-password" required minlength="6" style="font-size: 0.9rem; padding: 9px 12px;">
+          <input type="password" id="password-input" class="form-input" placeholder="6文字以上"
+            autocomplete="current-password" required minlength="6" style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
 
         <div class="form-group" id="secret-code-group" style="margin-bottom: 16px; display: none;">
           <label class="form-label" for="secret-input">家族共通の合言葉（招待コード）</label>
-          <input type="password" id="secret-input" class="form-input" placeholder="合言葉を入力" style="font-size: 0.9rem; padding: 9px 12px;">
+          <input type="password" id="secret-input" class="form-input" placeholder="合言葉を入力"
+            style="font-size: 0.9rem; padding: 9px 12px;">
         </div>
 
-        <button type="submit" class="btn btn-primary" id="btn-auth-submit" style="width: 100%; padding: 10px; font-size: 0.95rem;">
+        <button type="submit" class="btn btn-primary" id="btn-auth-submit"
+          style="width: 100%; padding: 10px; font-size: 0.95rem;">
           ログインする
         </button>
-        
+
         <div class="login-error" id="login-error" style="display: none; margin-top: 12px;"></div>
         <div class="auth-success" id="auth-success" style="display: none;"></div>
 
         <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border); text-align: center;">
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-open-password-login" style="width: 100%; font-size: 0.82rem; padding: 8px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-open-password-login"
+            style="width: 100%; font-size: 0.82rem; padding: 8px;">
             🔑 パスワードを変更する
           </button>
         </div>
@@ -1009,7 +1090,8 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="new-friend-note">備考（任意）</label>
-          <input type="text" id="new-friend-note" class="form-input" placeholder="例: 地元フレンド / ポケGOキラ交換待ち" maxlength="80">
+          <input type="text" id="new-friend-note" class="form-input" placeholder="例: 地元フレンド / ポケGOキラ交換待ち"
+            maxlength="80">
         </div>
         <button class="btn btn-primary" id="btn-add-friend" style="width: 100%; margin-top: 4px;">
           フレンドを追加する
@@ -1023,7 +1105,10 @@
 
       <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border); text-align: center;">
         <button class="btn btn-secondary btn-sm" id="btn-open-password-sub" style="width: 100%;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
           パスワードを変更する
         </button>
       </div>
@@ -1040,14 +1125,18 @@
       <form id="password-change-form" style="margin-top: 12px;">
         <div class="form-group">
           <label class="form-label" for="input-new-password">新しいパスワード</label>
-          <input type="password" class="form-input" id="input-new-password" placeholder="6文字以上を入力" required minlength="6">
+          <input type="password" class="form-input" id="input-new-password" placeholder="6文字以上を入力" required
+            minlength="6">
         </div>
         <div class="form-group">
           <label class="form-label" for="input-confirm-password">新しいパスワード（確認）</label>
-          <input type="password" class="form-input" id="input-confirm-password" placeholder="もう一度入力" required minlength="6">
+          <input type="password" class="form-input" id="input-confirm-password" placeholder="もう一度入力" required
+            minlength="6">
         </div>
         <div id="password-error" class="auth-error" style="display: none; margin-bottom: 12px;"></div>
-        <div id="password-success" class="auth-success" style="display: none; margin-bottom: 12px; color: #10B981; background: #ECFDF5; padding: 10px; border-radius: 8px; font-size: 0.85rem;"></div>
+        <div id="password-success" class="auth-success"
+          style="display: none; margin-bottom: 12px; color: #10B981; background: #ECFDF5; padding: 10px; border-radius: 8px; font-size: 0.85rem;">
+        </div>
         <button type="submit" class="btn btn-primary" id="btn-password-submit" style="width: 100%; margin-top: 8px;">
           パスワードを変更する
         </button>
@@ -1056,7 +1145,8 @@
   </div>
 
   <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <script>
     /**
@@ -1547,6 +1637,7 @@
             recordsData.forEach(item => {
               records[item.spot_id] = {
                 acquired_date: item.acquired_date || "",
+                received_date: item.received_date || "",
                 friend_name: item.friend_name || ""
               };
             });
@@ -1607,6 +1698,7 @@
             const row = payload.new;
             records[row.spot_id] = {
               acquired_date: row.acquired_date || "",
+              received_date: row.received_date || "",
               friend_name: row.friend_name || ""
             };
             updateSingleMarker(row.spot_id);
@@ -1653,20 +1745,21 @@
 
     /**
      * ステータス判定
-     * - acquired: 自分で獲得（取得日に値がある）
-     * - received: 人からもらった（取得日が空 かつ フレンド名がある）
-     * - unacquired: 未所持（どちらも空）
+     * - acquired: 自分で獲得（自分で取得した日に値がある）
+     * - received: 人からもらった（自分で取得した日は空、フレンド受取日またはフレンド名がある）
+     * - unacquired: 未所持（すべて空）
      */
     function getSpotStatus(spotId) {
       const rec = records[spotId];
       if (!rec) return "unacquired";
 
-      const hasDate = rec.acquired_date && rec.acquired_date.trim() !== "";
+      const hasAcquiredDate = rec.acquired_date && rec.acquired_date.trim() !== "";
+      const hasReceivedDate = rec.received_date && rec.received_date.trim() !== "";
       const hasFriend = rec.friend_name && rec.friend_name.trim() !== "";
 
-      if (hasDate) {
+      if (hasAcquiredDate) {
         return "acquired"; // 自分で獲得（オレンジ）
-      } else if (hasFriend) {
+      } else if (hasReceivedDate || hasFriend) {
         return "received"; // 人からもらった（青）
       } else {
         return "unacquired"; // 未所持（グレー）
@@ -1753,6 +1846,18 @@
      */
     function createTooltipContent(spot) {
       const displayAddress = spot.address || `${spot.prefecture}${spot.city}${spot.location}`;
+      const rec = records[spot.pokefuta_id] || {};
+      let infoHtml = "";
+
+      if (rec.acquired_date) {
+        infoHtml += `<div style="font-size: 0.72rem; color: #EA580C; font-weight: 700; margin-top: 3px;">🟧 自分で獲得: ${escapeHtml(rec.acquired_date)}</div>`;
+      }
+      if (rec.received_date || rec.friend_name) {
+        const friendText = rec.friend_name ? ` (${escapeHtml(rec.friend_name)})` : "";
+        const dateText = rec.received_date ? escapeHtml(rec.received_date) : "受取済";
+        infoHtml += `<div style="font-size: 0.72rem; color: #0284C7; font-weight: 700; margin-top: 3px;">🟦 フレンド受取${friendText}: ${dateText}</div>`;
+      }
+
       return `
         <div class="tooltip-card">
           <div class="tooltip-region">
@@ -1765,6 +1870,7 @@
           <div class="tooltip-name">
             ポケふた: ${escapeHtml(spot.name)}
           </div>
+          ${infoHtml}
         </div>
       `;
     }
@@ -1773,19 +1879,19 @@
      * ポップアップHTMLの構築
      */
     function createPopupContent(spot) {
-      const rec = records[spot.pokefuta_id] || { acquired_date: "", friend_name: "" };
+      const rec = records[spot.pokefuta_id] || { acquired_date: "", received_date: "", friend_name: "" };
       const status = getSpotStatus(spot.pokefuta_id);
 
       let badgeHtml = "";
       if (status === "acquired") {
         badgeHtml = '<span class="popup-badge badge-orange">自分で獲得</span>';
       } else if (status === "received") {
-        badgeHtml = '<span class="popup-badge badge-blue">人からもらった</span>';
+        badgeHtml = '<span class="popup-badge badge-blue">フレンドからもらった</span>';
       } else {
         badgeHtml = '<span class="popup-badge badge-gray">未所持</span>';
       }
 
-      let friendOptions = `<option value="">（指定なし / 未選択）</option>`;
+      let friendOptions = `<option value="">（選択なし）</option>`;
       friends.forEach(f => {
         const isSelected = rec.friend_name === f.name ? "selected" : "";
         const label = f.note ? `${escapeHtml(f.name)} (${escapeHtml(f.note)})` : escapeHtml(f.name);
@@ -1819,16 +1925,34 @@
         </div>
 
         <div class="popup-form">
-          <div class="form-group">
-            <label class="form-label" for="date-${spot.pokefuta_id}">取得日（自分で獲得した場合）</label>
-            <input type="date" id="date-${spot.pokefuta_id}" class="form-input" value="${rec.acquired_date || ""}">
+          <!-- 自分で現地獲得カード -->
+          <div class="record-section record-section-acquired">
+            <div class="record-section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>自分で現地獲得</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="date-acquired-${spot.pokefuta_id}">取得日（自分が現地で獲得した日）</label>
+              <input type="date" id="date-acquired-${spot.pokefuta_id}" class="form-input" value="${rec.acquired_date || ""}">
+            </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="friend-${spot.pokefuta_id}">フレンド名（もらった場合）</label>
-            <select id="friend-${spot.pokefuta_id}" class="form-select">
-              ${friendOptions}
-            </select>
+          <!-- フレンドからもらったカード -->
+          <div class="record-section record-section-received">
+            <div class="record-section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+              <span>フレンドからもらった</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="date-received-${spot.pokefuta_id}">もらった日</label>
+              <input type="date" id="date-received-${spot.pokefuta_id}" class="form-input" value="${rec.received_date || ""}">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="friend-${spot.pokefuta_id}">くれたフレンド名</label>
+              <select id="friend-${spot.pokefuta_id}" class="form-select">
+                ${friendOptions}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -1836,27 +1960,27 @@
           <button class="btn btn-primary" id="btn-save-${spot.pokefuta_id}" style="width: 100%;">
             保存する
           </button>
-          ${
-            spot.officialUrl ? `
+          ${spot.officialUrl ? `
               <a href="${spot.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-official">
                 <span>ポケふた公式サイトを見る</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               </a>
             ` : ""
-          }
+        }
         </div>
       `;
 
       // 保存ボタンのイベント登録
       const saveBtn = container.querySelector(`#btn-save-${spot.pokefuta_id}`);
       saveBtn.addEventListener("click", async () => {
-        const dateVal = container.querySelector(`#date-${spot.pokefuta_id}`).value;
+        const acquiredDateVal = container.querySelector(`#date-acquired-${spot.pokefuta_id}`).value;
+        const receivedDateVal = container.querySelector(`#date-received-${spot.pokefuta_id}`).value;
         const friendVal = container.querySelector(`#friend-${spot.pokefuta_id}`).value;
         saveBtn.disabled = true;
         saveBtn.textContent = "保存中...";
 
-        const success = await saveRecord(spot.pokefuta_id, dateVal, friendVal);
-        
+        const success = await saveRecord(spot.pokefuta_id, acquiredDateVal, receivedDateVal, friendVal);
+
         if (success) {
           saveBtn.textContent = "保存完了!";
           setTimeout(() => {
@@ -1874,9 +1998,10 @@
     /**
      * 記録の保存処理
      */
-    async function saveRecord(spotId, acquiredDate, friendName) {
+    async function saveRecord(spotId, acquiredDate, receivedDate, friendName) {
       records[spotId] = {
         acquired_date: acquiredDate,
+        received_date: receivedDate,
         friend_name: friendName
       };
 
@@ -1888,6 +2013,7 @@
             user_id: currentUser.id,
             spot_id: spotId,
             acquired_date: acquiredDate || null,
+            received_date: receivedDate || null,
             friend_name: friendName || null,
             updated_at: new Date().toISOString()
           };
@@ -1896,6 +2022,21 @@
           let { error } = await supabaseClient
             .from("pokefuta_records")
             .upsert(payload, { onConflict: "user_id,spot_id" });
+
+          if (error && error.message && error.message.includes("received_date")) {
+            // received_date カラムがデータベースに存在しない場合のフォールバック
+            const fallbackPayload = {
+              user_id: currentUser.id,
+              spot_id: spotId,
+              acquired_date: acquiredDate || null,
+              friend_name: friendName || null,
+              updated_at: new Date().toISOString()
+            };
+            const fallbackRes = await supabaseClient
+              .from("pokefuta_records")
+              .upsert(fallbackPayload, { onConflict: "user_id,spot_id" });
+            error = fallbackRes.error;
+          }
 
           if (error && error.message && error.message.includes("onConflict")) {
             // 制約名がspot_id単体の場合のフォールバック
@@ -2227,4 +2368,5 @@
     });
   </script>
 </body>
+
 </html>
