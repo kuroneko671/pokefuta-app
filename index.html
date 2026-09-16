@@ -1603,6 +1603,15 @@
      * データのロード（Supabase または LocalStorage）
      */
     async function loadData() {
+      // LocalStorage側のレコードを事前読み込み（Supabase側にカラムがない場合のバックアップ・マージ用）
+      let localRecords = {};
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_LOCAL_RECORDS);
+        if (saved) localRecords = JSON.parse(saved);
+      } catch (e) {
+        console.error("LocalStorageデータ参照エラー:", e);
+      }
+
       if (isSupabaseConfigured && supabaseClient && currentUser) {
         try {
           // フレンド一覧取得 (user_idで明示的にフィルタ)
@@ -1635,12 +1644,15 @@
           } else if (recordsData) {
             records = {};
             recordsData.forEach(item => {
+              const localRec = localRecords[item.spot_id] || {};
               records[item.spot_id] = {
                 acquired_date: item.acquired_date || "",
-                received_date: item.received_date || "",
+                received_date: item.received_date || localRec.received_date || "",
                 friend_name: item.friend_name || ""
               };
             });
+            // マージした最新データをLocalStorageにも保存
+            saveToLocalStorage();
             syncText.textContent = "Supabase 同期中";
             syncDot.classList.remove("offline");
           }
@@ -1696,11 +1708,13 @@
         }, (payload) => {
           if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
             const row = payload.new;
+            const existing = records[row.spot_id] || {};
             records[row.spot_id] = {
               acquired_date: row.acquired_date || "",
-              received_date: row.received_date || "",
+              received_date: row.received_date || existing.received_date || "",
               friend_name: row.friend_name || ""
             };
+            saveToLocalStorage();
             updateSingleMarker(row.spot_id);
             updateStatistics();
           } else if (payload.eventType === "DELETE") {
