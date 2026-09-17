@@ -779,26 +779,6 @@
       color: var(--text-main);
     }
 
-    .friend-code-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.76rem;
-      background: #E2E8F0;
-      color: #334155;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-family: monospace;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      width: fit-content;
-    }
-
-    .friend-code-badge:hover {
-      background: #CBD5E1;
-      color: #0F172A;
-    }
-
     .friend-note {
       font-size: 0.78rem;
       color: var(--text-muted);
@@ -1085,10 +1065,6 @@
           <input type="text" id="new-friend-name" class="form-input" placeholder="例: サトシ" maxlength="30">
         </div>
         <div class="form-group">
-          <label class="form-label" for="new-friend-code">トレーナーコード（任意）</label>
-          <input type="text" id="new-friend-code" class="form-input" placeholder="例: 1234 5678 9012" maxlength="24">
-        </div>
-        <div class="form-group">
           <label class="form-label" for="new-friend-note">備考（任意）</label>
           <input type="text" id="new-friend-note" class="form-input" placeholder="例: 地元フレンド / ポケGOキラ交換待ち"
             maxlength="80">
@@ -1252,7 +1228,6 @@
     const btnOpenFriends = document.getElementById("btn-open-friends");
     const btnCloseFriends = document.getElementById("btn-close-friends");
     const newFriendNameInput = document.getElementById("new-friend-name");
-    const newFriendCodeInput = document.getElementById("new-friend-code");
     const newFriendNoteInput = document.getElementById("new-friend-note");
     const btnAddFriend = document.getElementById("btn-add-friend");
     const friendListContainer = document.getElementById("friend-list-container");
@@ -1675,8 +1650,8 @@
       try {
         const savedFriends = localStorage.getItem(STORAGE_KEY_LOCAL_FRIENDS);
         friends = savedFriends ? JSON.parse(savedFriends) : [
-          { id: "f1", name: "サトシ", trainer_code: "1234 5678 9012", note: "マサラタウン / キラ交換待ち" },
-          { id: "f2", name: "カスミ", trainer_code: "9876 5432 1098", note: "ハナダシティ" }
+          { id: "f1", name: "サトシ", note: "マサラタウン / キラ交換待ち" },
+          { id: "f2", name: "カスミ", note: "ハナダシティ" }
         ];
 
         const savedRecords = localStorage.getItem(STORAGE_KEY_LOCAL_RECORDS);
@@ -2184,7 +2159,7 @@
     });
 
     btnAddFriend.addEventListener("click", addFriend);
-    [newFriendNameInput, newFriendCodeInput, newFriendNoteInput].forEach(input => {
+    [newFriendNameInput, newFriendNoteInput].forEach(input => {
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -2195,7 +2170,6 @@
 
     async function addFriend() {
       const name = newFriendNameInput.value.trim();
-      const trainerCode = newFriendCodeInput.value.trim();
       const note = newFriendNoteInput.value.trim();
 
       if (!name) {
@@ -2212,7 +2186,6 @@
       const newFriend = {
         id: tempId,
         name: name,
-        trainer_code: trainerCode,
         note: note
       };
 
@@ -2220,7 +2193,6 @@
         try {
           const insertPayload = {
             name: name,
-            trainer_code: trainerCode || null,
             note: note || null
           };
           if (currentUser) {
@@ -2248,7 +2220,6 @@
       }
 
       newFriendNameInput.value = "";
-      newFriendCodeInput.value = "";
       newFriendNoteInput.value = "";
       renderFriendList();
     }
@@ -2297,16 +2268,6 @@
         const li = document.createElement("li");
         li.className = "friend-item";
 
-        const codeBadgeHtml = f.trainer_code ? `
-          <div class="friend-code-badge" data-code="${escapeHtml(f.trainer_code)}" title="クリックしてコピー">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span class="code-text">${escapeHtml(f.trainer_code)}</span>
-          </div>
-        ` : "";
-
         const noteHtml = f.note ? `
           <div class="friend-note">${escapeHtml(f.note)}</div>
         ` : "";
@@ -2320,31 +2281,8 @@
               </button>
             </div>
           </div>
-          ${codeBadgeHtml}
           ${noteHtml}
         `;
-
-        // トレーナーコードのクリックコピー機能
-        const codeBadge = li.querySelector(".friend-code-badge");
-        if (codeBadge) {
-          codeBadge.addEventListener("click", () => {
-            const codeToCopy = codeBadge.dataset.code;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(codeToCopy).then(() => {
-                const textSpan = codeBadge.querySelector(".code-text");
-                const originalText = textSpan.textContent;
-                textSpan.textContent = "コピー完了!";
-                setTimeout(() => {
-                  textSpan.textContent = originalText;
-                }, 1200);
-              }).catch(() => {
-                prompt("トレーナーコードをコピーしてください:", codeToCopy);
-              });
-            } else {
-              prompt("トレーナーコードをコピーしてください:", codeToCopy);
-            }
-          });
-        }
 
         li.querySelector(".btn-delete-friend").addEventListener("click", () => {
           deleteFriend(f.id, f.name);
