@@ -24,8 +24,7 @@
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- ポケふたマスターデータ -->
-  <script src="data.js"></script>
+
 
   <style>
     :root {
@@ -2306,6 +2305,120 @@
     }
 
     /**
+     * CSV読み込みエラー表示
+     */
+    function showCSVLoadError(msg) {
+      let banner = document.getElementById("csv-load-error-banner");
+      if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "csv-load-error-banner";
+        banner.style.cssText = "position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 99999; background-color: #ef4444; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.25); text-align: center; max-width: 90%; font-size: 14px;";
+        document.body.appendChild(banner);
+      }
+      banner.textContent = msg;
+    }
+
+    /**
+     * CSV文字列の堅牢なパース（ダブルクォート、カンマ、改行、UTF-8対応）
+     */
+    function parseCSV(csvText) {
+      const lines = [];
+      let row = [];
+      let currentField = "";
+      let insideQuote = false;
+
+      for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
+        if (insideQuote) {
+          if (char === '"') {
+            if (nextChar === '"') {
+              currentField += '"';
+              i++;
+            } else {
+              insideQuote = false;
+            }
+          } else {
+            currentField += char;
+          }
+        } else {
+          if (char === '"') {
+            insideQuote = true;
+          } else if (char === ',') {
+            row.push(currentField);
+            currentField = "";
+          } else if (char === '\r') {
+            if (nextChar === '\n') {
+              i++;
+            }
+            row.push(currentField);
+            lines.push(row);
+            row = [];
+            currentField = "";
+          } else if (char === '\n') {
+            row.push(currentField);
+            lines.push(row);
+            row = [];
+            currentField = "";
+          } else {
+            currentField += char;
+          }
+        }
+      }
+
+      if (currentField !== "" || row.length > 0) {
+        row.push(currentField);
+        lines.push(row);
+      }
+
+      if (lines.length === 0) return [];
+
+      const headers = lines[0].map(h => h.trim());
+      const result = [];
+
+      for (let l = 1; l < lines.length; l++) {
+        const rowValues = lines[l];
+        if (rowValues.length === 1 && rowValues[0].trim() === "") continue;
+
+        const item = {};
+        headers.forEach((header, idx) => {
+          let val = rowValues[idx] !== undefined ? rowValues[idx].trim() : "";
+          if (header === "lat" || header === "lng") {
+            item[header] = val ? parseFloat(val) : 0;
+          } else {
+            item[header] = val;
+          }
+        });
+        result.push(item);
+      }
+
+      return result;
+    }
+
+    /**
+     * GitHub上のpokefuta.csvの非同期読み込み
+     */
+    async function loadPokefutaCSV() {
+      try {
+        const response = await fetch("./pokefuta.csv");
+        if (!response.ok) {
+          throw new Error(`HTTPステータスエラー: ${response.status}`);
+        }
+        const csvText = await response.text();
+        const parsedData = parseCSV(csvText);
+        if (!parsedData || parsedData.length === 0) {
+          throw new Error("CSVデータが空か解析に失敗しました。");
+        }
+        window.pokefutaData = parsedData;
+      } catch (error) {
+        console.error("ポケふた基本データ(CSV)の読み込み失敗:", error);
+        window.pokefutaData = [];
+        showCSVLoadError("ポケふた基本データの読み込みに失敗しました。");
+      }
+    }
+
+    /**
      * アプリ開始処理
      */
     function startApp() {
@@ -2314,7 +2427,8 @@
     }
 
     // 起動時実行
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadPokefutaCSV();
       initSupabase();
       initAuth();
     });
