@@ -850,6 +850,158 @@
       }
     }
 
+    /* 市町村検索エリア */
+    .city-search-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .city-search-input-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .city-search-icon {
+      position: absolute;
+      left: 10px;
+      color: var(--text-muted);
+      pointer-events: none;
+      line-height: 0;
+    }
+
+    #city-search-input {
+      width: 100%;
+      padding: 8px 34px 8px 34px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #F8FAFC;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #city-search-input:focus {
+      border-color: #E11D48;
+      box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12);
+      background: #FFFFFF;
+    }
+
+    .city-search-clear {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      line-height: 0;
+      padding: 4px;
+      border-radius: 50%;
+      transition: color 0.15s ease, background 0.15s ease;
+      display: none;
+    }
+
+    .city-search-clear:hover {
+      color: #E11D48;
+      background: rgba(225, 29, 72, 0.08);
+    }
+
+    .city-search-result-info {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #E11D48;
+      display: none;
+      padding: 0 4px;
+    }
+
+    .city-search-result-info.no-result {
+      color: var(--text-muted);
+    }
+
+    .city-search-result-list {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+      scrollbar-width: thin;
+      scrollbar-color: #CBD5E1 transparent;
+    }
+
+    .city-search-result-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .city-search-result-list::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 999px;
+    }
+
+    .city-search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .city-search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .city-search-result-item:hover {
+      background: #FFF1F2;
+    }
+
+    .city-search-result-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #E11D48;
+      flex-shrink: 0;
+    }
+
+    .city-search-result-city {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #E11D48;
+      white-space: nowrap;
+    }
+
+    .city-search-result-name {
+      font-size: 0.78rem;
+      color: var(--text-main);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .city-search-result-pokemon {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* 検索ヒット時のマーカー（赤） */
+    .pin-red .pin-body {
+      background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
+      width: 42px;
+      height: 42px;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.45);
+    }
+
     /* レスポンシブ対応 */
     @media (max-width: 640px) {
       header {
@@ -891,6 +1043,10 @@
 
       .leaflet-popup-content {
         min-width: 250px;
+      }
+
+      .city-search-result-list {
+        max-height: 160px;
       }
     }
   </style>
@@ -983,6 +1139,27 @@
         <span>未所持</span>
         <span class="badge-count" id="count-unacquired">0</span>
       </button>
+    </div>
+
+    <!-- 市町村名検索 -->
+    <div class="city-search-wrap">
+      <div class="city-search-input-row">
+        <span class="city-search-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <input
+          type="text"
+          id="city-search-input"
+          placeholder="🔍 市町村名を検索"
+          autocomplete="off"
+          inputmode="search"
+        >
+        <button class="city-search-clear" id="city-search-clear" title="検索をクリア" aria-label="検索をクリア">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="city-search-result-info" id="city-search-result-info"></div>
+      <div class="city-search-result-list" id="city-search-result-list"></div>
     </div>
   </div>
 
@@ -1187,6 +1364,9 @@
     let isSupabaseConfigured = false;
     let currentUser = null;
     let currentAuthMode = "login"; // "login" | "signup"
+
+    // 市町村検索状態
+    let searchHighlightedIds = new Set(); // 現在検索でヒットしているspot_idセット
 
     // 家族登録用セキュリティ（合言葉）
     const FAMILY_SECRET_CODE = "fuwante2025";
@@ -1756,8 +1936,28 @@
 
     /**
      * マーカーアイコン生成（SVGベース）
+     * isSearchHit=true の場合、赤色・大きめのアイコンで強調表示する
      */
-    function createMarkerIcon(status) {
+    function createMarkerIcon(status, isSearchHit) {
+      if (isSearchHit) {
+        const redSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>`;
+        return L.divIcon({
+          className: "",
+          iconSize: [42, 52],
+          iconAnchor: [21, 52],
+          popupAnchor: [0, -50],
+          html: `
+            <div class="custom-marker-pin pin-red" style="width:42px;height:52px;">
+              <div class="pin-body" style="width:42px;height:42px;">
+                <div class="pin-content">
+                  ${redSvg}
+                </div>
+              </div>
+            </div>
+          `
+        });
+      }
+
       let pinClass = "pin-gray";
       let iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg>`;
 
@@ -2070,10 +2270,20 @@
       if (!marker) return;
 
       const status = getSpotStatus(spotId);
-      marker.setIcon(createMarkerIcon(status));
+      const isSearchHit = searchHighlightedIds.has(spotId);
+      marker.setIcon(createMarkerIcon(status, isSearchHit));
 
-      // フィルター適用
-      applyFilterToMarker(spotId, marker, status);
+      // 検索中は検索ヒット分のみ表示（フィルターと独立）
+      if (searchHighlightedIds.size > 0) {
+        if (isSearchHit) {
+          if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+          if (map.hasLayer(marker)) map.removeLayer(marker);
+        }
+      } else {
+        // 通常のフィルター適用
+        applyFilterToMarker(spotId, marker, status);
+      }
     }
 
     function updateAllMarkers() {
@@ -2136,6 +2346,103 @@
         currentFilter = btn.dataset.filter;
         updateAllMarkers();
       });
+    });
+
+    /**
+     * 市町村名検索機能
+     */
+    const citySearchInput = document.getElementById("city-search-input");
+    const citySearchClear = document.getElementById("city-search-clear");
+    const citySearchResultInfo = document.getElementById("city-search-result-info");
+    const citySearchResultList = document.getElementById("city-search-result-list");
+
+    function performCitySearch(query) {
+      const trimmed = query.trim();
+
+      // 空の場合は検索解除
+      if (!trimmed) {
+        clearCitySearch();
+        return;
+      }
+
+      // クリアボタンを表示
+      citySearchClear.style.display = "flex";
+
+      const allSpots = window.pokefutaData || [];
+      const hits = allSpots.filter(spot => spot.city && spot.city.includes(trimmed));
+
+      // 検索ヒットIDを更新
+      searchHighlightedIds = new Set(hits.map(s => s.pokefuta_id));
+
+      // マーカー全更新（赤色強調 or 通常色）
+      updateAllMarkers();
+
+      // 結果件数表示
+      citySearchResultInfo.style.display = "block";
+      if (hits.length === 0) {
+        citySearchResultInfo.textContent = "該当する市町村が見つかりません";
+        citySearchResultInfo.classList.add("no-result");
+        citySearchResultList.style.display = "none";
+        return;
+      }
+
+      citySearchResultInfo.textContent = `検索結果：${hits.length}件`;
+      citySearchResultInfo.classList.remove("no-result");
+
+      // 結果一覧を構築
+      citySearchResultList.innerHTML = "";
+      hits.forEach(spot => {
+        const item = document.createElement("div");
+        item.className = "city-search-result-item";
+        item.innerHTML = `
+          <span class="city-search-result-dot"></span>
+          <span class="city-search-result-city">${escapeHtml(spot.city)}</span>
+          <span class="city-search-result-name">${escapeHtml(spot.location || spot.address || "")}</span>
+          <span class="city-search-result-pokemon">${escapeHtml(spot.name)}</span>
+        `;
+        item.addEventListener("click", () => {
+          jumpToSpot(spot);
+        });
+        citySearchResultList.appendChild(item);
+      });
+      citySearchResultList.style.display = "flex";
+
+      // 地図の表示範囲を全ヒットが見えるように調整
+      if (hits.length === 1) {
+        const spot = hits[0];
+        map.setView([spot.lat, spot.lng], 14, { animate: true });
+      } else {
+        const latlngs = hits.map(s => [s.lat, s.lng]);
+        map.fitBounds(latlngs, { padding: [40, 40], maxZoom: 14, animate: true });
+      }
+    }
+
+    function jumpToSpot(spot) {
+      const marker = markers[spot.pokefuta_id];
+      if (!marker) return;
+      map.setView([spot.lat, spot.lng], 15, { animate: true });
+      setTimeout(() => marker.openPopup(), 300);
+    }
+
+    function clearCitySearch() {
+      searchHighlightedIds = new Set();
+      citySearchInput.value = "";
+      citySearchClear.style.display = "none";
+      citySearchResultInfo.style.display = "none";
+      citySearchResultInfo.classList.remove("no-result");
+      citySearchResultList.style.display = "none";
+      citySearchResultList.innerHTML = "";
+      // マーカーを通常の色・フィルター状態に戻す
+      updateAllMarkers();
+    }
+
+    citySearchInput.addEventListener("input", () => {
+      performCitySearch(citySearchInput.value);
+    });
+
+    citySearchClear.addEventListener("click", () => {
+      clearCitySearch();
+      citySearchInput.focus();
     });
 
     /**
