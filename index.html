@@ -1351,6 +1351,50 @@
      * -- 4. リアルタイム同期の有効化
      * ALTER PUBLICATION supabase_realtime ADD TABLE pokefuta_friends;
      * ALTER PUBLICATION supabase_realtime ADD TABLE pokefuta_records;
+     * 
+     * -- 5. 家族合言葉検証用の設定テーブル（外部からの直接SELECT/操作はRLSで遮断）
+     * CREATE TABLE IF NOT EXISTS public.pokefuta_secrets (
+     *   key TEXT PRIMARY KEY,
+     *   secret_value TEXT NOT NULL
+     * );
+     * 
+     * -- RLSを有効化（ポリシーを作成しないことで、anon / authenticated からの直接操作を完全遮断）
+     * ALTER TABLE public.pokefuta_secrets ENABLE ROW LEVEL SECURITY;
+     * 
+     * -- 合言葉の初期登録（'あなたの家族の合言葉' を任意のものに設定）
+     * INSERT INTO public.pokefuta_secrets (key, secret_value)
+     * VALUES ('family_invite_code', 'あなたの家族の秘密の合言葉')
+     * ON CONFLICT (key) DO UPDATE SET secret_value = EXCLUDED.secret_value;
+     * 
+     * -- 6. 合言葉検証用ファンクション（SECURITY DEFINER / search_path安全設定）
+     * CREATE OR REPLACE FUNCTION public.verify_family_code(code text)
+     * RETURNS boolean
+     * LANGUAGE plpgsql
+     * SECURITY DEFINER
+     * SET search_path = ''
+     * AS $$
+     * DECLARE
+     *   stored_code text;
+     * BEGIN
+     *   IF code IS NULL OR pg_catalog.btrim(code) = '' THEN
+     *     RETURN false;
+     *   END IF;
+     * 
+     *   SELECT secret_value INTO stored_code
+     *   FROM public.pokefuta_secrets
+     *   WHERE key = 'family_invite_code';
+     * 
+     *   IF stored_code IS NULL THEN
+     *     RETURN false;
+     *   END IF;
+     * 
+     *   RETURN (stored_code = pg_catalog.btrim(code));
+     * END;
+     * $$;
+     * 
+     * -- 権限設定: PUBLICから剥奪し、anon と authenticated にのみ実行権限を付与
+     * REVOKE EXECUTE ON FUNCTION public.verify_family_code(text) FROM PUBLIC;
+     * GRANT EXECUTE ON FUNCTION public.verify_family_code(text) TO anon, authenticated;
      * =========================================================================
      */
 
@@ -1367,9 +1411,6 @@
 
     // 市町村検索状態
     let searchHighlightedIds = new Set(); // 現在検索でヒットしているspot_idセット
-
-    // 家族登録用セキュリティ（合言葉）
-    const FAMILY_SECRET_CODE = "fuwante2025";
 
     // LocalStorage キー
     const STORAGE_KEY_LOCAL_FRIENDS = "pokefuta_local_friends";
@@ -1479,14 +1520,28 @@
               showAuthError("Supabaseが接続されていません");
             }
           } else {
-            // 新規登録時の家族合言葉チェック
+            // 新規登録時の家族合言葉チェック（Supabase RPC経由で安全に検証）
             const inputSecret = secretInput.value.trim();
-            if (inputSecret !== FAMILY_SECRET_CODE) {
-              showAuthError("家族共通の合言葉が正しくありません");
+            if (!inputSecret) {
+              showAuthError("家族共通の合言葉を入力してください");
               return;
             }
 
             if (isSupabaseConfigured && supabaseClient) {
+              // サーバー側で合言葉を検証（正解の合言葉そのものはブラウザ側に渡されません）
+              const { data: isValid, error: rpcError } = await supabaseClient.rpc("verify_family_code", { code: inputSecret });
+
+              if (rpcError) {
+                console.error("合言葉検証エラー:", rpcError);
+                showAuthError("合言葉の検証中に通信エラーが発生しました: " + rpcError.message);
+                return;
+              }
+
+              if (!isValid) {
+                showAuthError("家族共通の合言葉が正しくありません");
+                return;
+              }
+
               const result = await Promise.race([
                 supabaseClient.auth.signUp({ email, password }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error("通信タイムアウトが発生しました。接続を確認してください。")), 10000))
