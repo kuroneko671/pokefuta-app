@@ -778,6 +778,19 @@
       color: var(--text-main);
     }
 
+    .friend-count-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0284C7;
+      background: #E0F2FE;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
     .friend-note {
       font-size: 0.78rem;
       color: var(--text-muted);
@@ -2612,6 +2625,12 @@
       }
     }
 
+    function getFriendSentCount(friendName) {
+      if (!friendName || !records) return 0;
+      const target = friendName.trim().toLowerCase();
+      return Object.values(records).filter(r => r && r.friend_name && r.friend_name.trim().toLowerCase() === target).length;
+    }
+
     function renderFriendList() {
       friendListContainer.innerHTML = "";
 
@@ -2625,9 +2644,21 @@
         return;
       }
 
-      friends.forEach(f => {
+      // 送ってくれた数が多い順に並び替え（同数の場合は名前順）
+      const sortedFriends = [...friends].sort((a, b) => {
+        const countA = getFriendSentCount(a.name);
+        const countB = getFriendSentCount(b.name);
+        if (countB !== countA) {
+          return countB - countA;
+        }
+        return (a.name || "").localeCompare(b.name || "", "ja");
+      });
+
+      sortedFriends.forEach(f => {
         const li = document.createElement("li");
         li.className = "friend-item";
+
+        const sentCount = getFriendSentCount(f.name);
 
         const noteHtml = f.note ? `
           <div class="friend-note">${escapeHtml(f.note)}</div>
@@ -2635,7 +2666,10 @@
 
         li.innerHTML = `
           <div class="friend-item-header">
-            <span class="friend-name">${escapeHtml(f.name)}</span>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="friend-name">${escapeHtml(f.name)}</span>
+              <span class="friend-count-badge">送ってくれた数: ${sentCount}個</span>
+            </div>
             <div class="friend-actions">
               <button class="btn btn-secondary btn-sm btn-delete-friend" data-id="${f.id}" data-name="${escapeHtml(f.name)}" style="color: #EF4444; padding: 3px 8px;">
                 削除
