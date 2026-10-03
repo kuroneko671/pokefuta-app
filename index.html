@@ -2138,14 +2138,7 @@
       const rec = records[spot.pokefuta_id] || { acquired_date: "", received_date: "", friend_name: "" };
       const status = getSpotStatus(spot.pokefuta_id);
 
-      let badgeHtml = "";
-      if (status === "acquired") {
-        badgeHtml = '<span class="popup-badge badge-orange">自分で獲得</span>';
-      } else if (status === "received") {
-        badgeHtml = '<span class="popup-badge badge-blue">フレンドからもらった</span>';
-      } else {
-        badgeHtml = '<span class="popup-badge badge-gray">未所持</span>';
-      }
+      const badgeHtml = "";
 
       let friendOptions = `<option value="">（選択なし）</option>`;
       friends.forEach(f => {
