@@ -367,7 +367,7 @@
     .leaflet-popup-content-wrapper {
       padding: 0;
       border-radius: var(--radius-md);
-      overflow: hidden;
+      overflow: visible;
       box-shadow: var(--shadow-lg);
       border: 1px solid rgba(0, 0, 0, 0.06);
     }
@@ -376,7 +376,7 @@
       margin: 0;
       line-height: 1.5;
       min-width: 275px;
-      max-width: 325px;
+      max-width: 330px;
     }
 
     /* ツールチップ（カーソルホバー時）カスタマイズ */
@@ -422,6 +422,8 @@
 
     .popup-card {
       padding: 16px;
+      background: #FFFFFF;
+      border-radius: var(--radius-md);
     }
 
     .popup-header {
@@ -580,6 +582,219 @@
     .form-select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
+    }
+
+    /* PC版フレンド選択：サイドバー風スクロールバー付きカスタムドロップダウン */
+    .desktop-friend-select-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .custom-friend-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+      width: 100%;
+      height: 38px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-family: inherit;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .custom-friend-trigger:hover {
+      border-color: var(--primary);
+    }
+
+    .desktop-friend-select-wrapper.is-open .custom-friend-trigger {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
+    }
+
+    .custom-friend-trigger-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      font-size: 0.83rem;
+    }
+
+    .custom-friend-chevron {
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: transform 0.2s ease;
+    }
+
+    .desktop-friend-select-wrapper.is-open .custom-friend-chevron {
+      transform: rotate(180deg);
+    }
+
+    .custom-friend-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      z-index: 1050;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: friendDropdownOpen 0.15s ease-out;
+    }
+
+    @keyframes friendDropdownOpen {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .desktop-friend-select-wrapper.is-open .custom-friend-dropdown {
+      display: flex;
+    }
+
+    .custom-friend-search-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .custom-friend-search-box svg {
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .custom-friend-search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.78rem;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+
+    /* フレンド一覧リスト：常時視認しやすいスクロールバー（サイドバー）を表示 */
+    .custom-friend-list {
+      max-height: 185px;
+      overflow-y: scroll; /* 常時スクロールバーを表示して全員確認可能に */
+      overscroll-behavior: contain;
+      background: #FFFFFF;
+      scrollbar-width: thin;
+      scrollbar-color: #94A3B8 #F1F5F9;
+    }
+
+    /* WebKit（Chrome, Edge, Safari等）用サイドバースクロールバー */
+    .custom-friend-list::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .custom-friend-list::-webkit-scrollbar-track {
+      background: #F1F5F9;
+      border-left: 1px solid #E2E8F0;
+    }
+
+    .custom-friend-list::-webkit-scrollbar-thumb {
+      background: #94A3B8;
+      border-radius: 6px;
+      border: 2px solid #F1F5F9;
+    }
+
+    .custom-friend-list::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    .custom-friend-item {
+      padding: 7px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-bottom: 1px solid #F8FAFC;
+      transition: background 0.12s ease;
+      user-select: none;
+    }
+
+    .custom-friend-item:last-child {
+      border-bottom: none;
+    }
+
+    .custom-friend-item:hover {
+      background: #F1F5F9;
+    }
+
+    .custom-friend-item.is-selected {
+      background: #FFF7ED;
+      border-left: 3px solid var(--primary);
+    }
+
+    .custom-friend-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .custom-friend-item-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .custom-friend-item.is-selected .custom-friend-item-name {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .custom-friend-item-count {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #0369A1;
+      background: #E0F2FE;
+      padding: 1px 6px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .custom-friend-item-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .custom-friend-empty {
+      padding: 14px 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* PC版・スマホ版の切り替え初期値 */
+    .mobile-friend-select {
+      display: none;
+    }
+    .desktop-friend-select-wrapper {
+      display: block;
     }
 
     .popup-actions {
@@ -1141,6 +1356,14 @@
 
       .leaflet-popup-content {
         min-width: 250px;
+      }
+
+      .mobile-friend-select {
+        display: block !important;
+      }
+
+      .desktop-friend-select-wrapper {
+        display: none !important;
       }
 
       .city-search-result-list {
@@ -2178,11 +2401,58 @@
 
       const badgeHtml = "";
 
+      // 送ってくれた数が多い順、同数の場合は名前順でソート
+      const sortedFriends = [...friends].sort((a, b) => {
+        const countA = getFriendSentCount(a.name);
+        const countB = getFriendSentCount(b.name);
+        if (countB !== countA) return countB - countA;
+        return (a.name || "").localeCompare(b.name || "", "ja");
+      });
+
+      // スマホ用ネイティブselectのoption
       let friendOptions = `<option value="">（選択なし）</option>`;
-      friends.forEach(f => {
+      sortedFriends.forEach(f => {
         const isSelected = rec.friend_name === f.name ? "selected" : "";
         const label = f.note ? `${escapeHtml(f.name)} (${escapeHtml(f.note)})` : escapeHtml(f.name);
         friendOptions += `<option value="${escapeHtml(f.name)}" ${isSelected}>${label}</option>`;
+      });
+
+      // PC用カスタムドロップダウンのアイテムHTML構築
+      let currentFriendLabel = "（選択なし）";
+      if (rec.friend_name) {
+        const currentFriendObj = friends.find(f => f.name === rec.friend_name);
+        if (currentFriendObj) {
+          currentFriendLabel = currentFriendObj.note
+            ? `${escapeHtml(currentFriendObj.name)} (${escapeHtml(currentFriendObj.note)})`
+            : escapeHtml(currentFriendObj.name);
+        } else {
+          currentFriendLabel = escapeHtml(rec.friend_name);
+        }
+      }
+
+      let customFriendItemsHtml = `
+        <div class="custom-friend-item ${!rec.friend_name ? "is-selected" : ""}" data-val="" data-label="（選択なし）" data-search="">
+          <div class="custom-friend-item-header">
+            <span class="custom-friend-item-name">（選択なし）</span>
+          </div>
+        </div>
+      `;
+
+      sortedFriends.forEach(f => {
+        const isSel = rec.friend_name === f.name;
+        const sentCount = getFriendSentCount(f.name);
+        const fullLabel = f.note ? `${f.name} (${f.note})` : f.name;
+        const searchKeywords = `${f.name} ${f.note || ""}`.toLowerCase();
+
+        customFriendItemsHtml += `
+          <div class="custom-friend-item ${isSel ? "is-selected" : ""}" data-val="${escapeHtml(f.name)}" data-label="${escapeHtml(fullLabel)}" data-search="${escapeHtml(searchKeywords)}">
+            <div class="custom-friend-item-header">
+              <span class="custom-friend-item-name">${escapeHtml(f.name)}</span>
+              ${sentCount > 0 ? `<span class="custom-friend-item-count">送ってくれた: ${sentCount}個</span>` : ""}
+            </div>
+            ${f.note ? `<div class="custom-friend-item-note">${escapeHtml(f.note)}</div>` : ""}
+          </div>
+        `;
       });
 
       const displayAddress = spot.address || `${spot.prefecture}${spot.city}${spot.location}`;
@@ -2236,9 +2506,29 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="friend-${spot.pokefuta_id}">くれたフレンド名</label>
-              <select id="friend-${spot.pokefuta_id}" class="form-select">
+              <!-- スマホ用ネイティブセレクト -->
+              <select id="friend-${spot.pokefuta_id}" class="form-select mobile-friend-select">
                 ${friendOptions}
               </select>
+              <!-- PC用カスタムセレクト（サイドバー風スクロールバー付きリスト＋検索） -->
+              <div class="desktop-friend-select-wrapper" id="desktop-friend-wrapper-${spot.pokefuta_id}">
+                <button type="button" class="custom-friend-trigger" id="custom-friend-trigger-${spot.pokefuta_id}" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="custom-friend-trigger-text" id="custom-friend-text-${spot.pokefuta_id}">${currentFriendLabel}</span>
+                  <svg class="custom-friend-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="custom-friend-dropdown" id="custom-friend-dropdown-${spot.pokefuta_id}">
+                  <div class="custom-friend-search-box">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="custom-friend-search-input" id="custom-friend-search-${spot.pokefuta_id}" placeholder="フレンド名・備考で検索..." autocomplete="off">
+                  </div>
+                  <div class="custom-friend-list" id="custom-friend-list-${spot.pokefuta_id}">
+                    ${customFriendItemsHtml}
+                  </div>
+                  <div class="custom-friend-empty" id="custom-friend-empty-${spot.pokefuta_id}" style="display: none;">
+                    該当するフレンドが見つかりません
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2256,6 +2546,102 @@
         }
         </div>
       `;
+
+      // PC用カスタムセレクトのイベント設定
+      const wrapperEl = container.querySelector(`#desktop-friend-wrapper-${spot.pokefuta_id}`);
+      if (wrapperEl) {
+        const triggerBtn = wrapperEl.querySelector(`#custom-friend-trigger-${spot.pokefuta_id}`);
+        const nativeSelect = container.querySelector(`#friend-${spot.pokefuta_id}`);
+        const triggerText = wrapperEl.querySelector(`#custom-friend-text-${spot.pokefuta_id}`);
+        const searchInput = wrapperEl.querySelector(`#custom-friend-search-${spot.pokefuta_id}`);
+        const listEl = wrapperEl.querySelector(`#custom-friend-list-${spot.pokefuta_id}`);
+        const emptyEl = wrapperEl.querySelector(`#custom-friend-empty-${spot.pokefuta_id}`);
+        const items = listEl.querySelectorAll(".custom-friend-item");
+
+        const toggleDropdown = (open) => {
+          const isOpen = open !== undefined ? open : !wrapperEl.classList.contains("is-open");
+          if (isOpen) {
+            wrapperEl.classList.add("is-open");
+            triggerBtn.setAttribute("aria-expanded", "true");
+            searchInput.value = "";
+            filterItems("");
+            setTimeout(() => searchInput.focus(), 60);
+          } else {
+            wrapperEl.classList.remove("is-open");
+            triggerBtn.setAttribute("aria-expanded", "false");
+          }
+        };
+
+        triggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleDropdown();
+        });
+
+        const filterItems = (query) => {
+          const q = (query || "").trim().toLowerCase();
+          let visibleCount = 0;
+          items.forEach(item => {
+            const searchKey = item.getAttribute("data-search") || "";
+            const isMatch = !q || searchKey.includes(q) || item.getAttribute("data-val") === "";
+            if (isMatch) {
+              item.style.display = "";
+              visibleCount++;
+            } else {
+              item.style.display = "none";
+            }
+          });
+          emptyEl.style.display = visibleCount === 0 ? "block" : "none";
+        };
+
+        searchInput.addEventListener("input", (e) => {
+          filterItems(e.target.value);
+        });
+
+        searchInput.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+
+        items.forEach(item => {
+          item.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const val = item.getAttribute("data-val") || "";
+            const label = item.getAttribute("data-label") || "（選択なし）";
+
+            nativeSelect.value = val;
+            nativeSelect.dispatchEvent(new Event("change"));
+
+            triggerText.textContent = label;
+
+            items.forEach(i => i.classList.remove("is-selected"));
+            item.classList.add("is-selected");
+
+            toggleDropdown(false);
+          });
+        });
+
+        nativeSelect.addEventListener("change", () => {
+          const selectedOption = nativeSelect.options[nativeSelect.selectedIndex];
+          const text = selectedOption ? selectedOption.textContent : "（選択なし）";
+          triggerText.textContent = text;
+          items.forEach(i => {
+            i.classList.toggle("is-selected", i.getAttribute("data-val") === nativeSelect.value);
+          });
+        });
+
+        const onDocClick = (e) => {
+          if (!wrapperEl.contains(e.target)) {
+            toggleDropdown(false);
+          }
+        };
+        document.addEventListener("click", onDocClick);
+
+        searchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            toggleDropdown(false);
+            triggerBtn.focus();
+          }
+        });
+      }
 
       // 保存ボタンのイベント登録
       const saveBtn = container.querySelector(`#btn-save-${spot.pokefuta_id}`);
