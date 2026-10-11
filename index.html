@@ -1555,6 +1555,145 @@
         padding: 8px 12px;
       }
     }
+
+    /* 都道府県別取得状況ビュー（文字と数字のみで表示、横棒グラフなし） */
+    .pref-view-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pref-view-region-summary {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pref-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .pref-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .pref-card:hover {
+      border-color: #CBD5E1;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .pref-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pref-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .pref-status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .pref-status-badge.completed {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+    }
+
+    .pref-status-badge.in-progress {
+      background: #FFF7ED;
+      color: #EA580C;
+      border: 1px solid #FDBA74;
+    }
+
+    .pref-status-badge.unacquired {
+      background: #F1F5F9;
+      color: #64748B;
+      border: 1px solid #CBD5E1;
+    }
+
+    .pref-status-badge.none {
+      background: #F8FAFC;
+      color: #94A3B8;
+      border: 1px solid #E2E8F0;
+    }
+
+    .pref-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #F8FAFC;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #F1F5F9;
+    }
+
+    .pref-stat-main-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pref-stat-main-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .pref-stat-main-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .pref-stat-percent-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-left: 4px;
+    }
+
+    .pref-stat-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      border-top: 1px dashed #E2E8F0;
+      padding-top: 6px;
+    }
   </style>
 </head>
 
@@ -1682,16 +1821,16 @@
   <div id="management-view" class="management-view-container" style="display: none;">
     <!-- 管理画面ヘッダー -->
     <div class="management-header">
-      <button class="btn btn-secondary btn-sm" id="btn-back-to-main" title="メイン画面に戻る">
+      <button class="btn btn-secondary btn-sm" id="btn-back-to-main" title="戻る">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        <span>戻る</span>
+        <span id="btn-management-back-text">戻る</span>
       </button>
       <div class="management-title-group">
-        <h2 class="management-title">ポケふた管理</h2>
-        <span class="management-subtitle">地方を選択してください</span>
+        <h2 class="management-title" id="management-title">ポケふた管理</h2>
+        <span class="management-subtitle" id="management-subtitle">地方を選択してください</span>
       </div>
       <div style="width: 60px;"></div>
     </div>
@@ -1808,6 +1947,23 @@
               </svg>
             </div>
           </button>
+        </div>
+      </div>
+
+      <!-- ビュー2: 都道府県別取得状況ビュー -->
+      <div id="management-pref-view" class="management-section" style="display: none;">
+        <div class="pref-view-header">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-back-to-regions">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>地方一覧に戻る</span>
+          </button>
+          <div class="pref-view-region-summary" id="pref-view-region-summary"></div>
+        </div>
+
+        <div class="pref-grid" id="pref-grid-container">
+          <!-- 都道府県カードが動的生成されます -->
         </div>
       </div>
     </div>
@@ -2097,6 +2253,12 @@
     const friendDetailContent = document.getElementById("friend-detail-content");
 
     const managementView = document.getElementById("management-view");
+    const managementRegionView = document.getElementById("management-region-view");
+    const managementPrefView = document.getElementById("management-pref-view");
+    const managementTitle = document.getElementById("management-title");
+    const managementSubtitle = document.getElementById("management-subtitle");
+    const btnManagementBackText = document.getElementById("btn-management-back-text");
+    const btnBackToRegions = document.getElementById("btn-back-to-regions");
     const btnOpenManagement = document.getElementById("btn-open-management");
     const btnBackToMain = document.getElementById("btn-back-to-main");
 
@@ -3157,6 +3319,9 @@
 
       // 地方ごとの取得状況更新
       updateRegionStatistics();
+      if (currentManagementMode === "prefecture" && currentSelectedRegionId) {
+        renderPrefectures(currentSelectedRegionId);
+      }
     }
 
     /**
@@ -3356,22 +3521,154 @@
       });
     }
 
+    // 管理画面の表示モード状態（"region" または "prefecture"）
+    let currentManagementMode = "region";
+    let currentSelectedRegionId = null;
+
+    /**
+     * 管理画面内のビュー切り替え
+     */
+    function switchManagementView(mode, regionId = null) {
+      currentManagementMode = mode;
+      currentSelectedRegionId = regionId;
+
+      if (mode === "region") {
+        if (managementRegionView) managementRegionView.style.display = "block";
+        if (managementPrefView) managementPrefView.style.display = "none";
+        if (managementTitle) managementTitle.textContent = "ポケふた管理";
+        if (managementSubtitle) managementSubtitle.textContent = "地方を選択してください";
+        if (btnManagementBackText) btnManagementBackText.textContent = "戻る";
+        updateRegionStatistics();
+      } else if (mode === "prefecture") {
+        const region = REGIONS.find(r => r.id === regionId);
+        if (!region) return;
+
+        if (managementRegionView) managementRegionView.style.display = "none";
+        if (managementPrefView) managementPrefView.style.display = "block";
+        if (managementTitle) managementTitle.textContent = `${region.name}のポケふた`;
+        if (managementSubtitle) managementSubtitle.textContent = "都道府県別の取得状況";
+        if (btnManagementBackText) btnManagementBackText.textContent = "地方一覧";
+
+        renderPrefectures(regionId);
+      }
+    }
+
+    /**
+     * 都道府県ごとの取得状況を表示
+     * - 横棒グラフ・プログレスバーは追加せず、文字と数字のみで表示
+     * - 北から南の自然な順序で表示
+     * - 自分で取得と友達からもらったを合算して集計（二重カウントなし）
+     */
+    function renderPrefectures(regionId) {
+      const region = REGIONS.find(r => r.id === regionId);
+      if (!region) return;
+
+      const allSpots = window.pokefutaData || [];
+      const container = document.getElementById("pref-grid-container");
+      const summaryEl = document.getElementById("pref-view-region-summary");
+      if (!container) return;
+
+      // 地方全体の集計（文字と数字のみ）
+      const regionSpots = allSpots.filter(spot => spot.prefecture && region.prefectures.includes(spot.prefecture));
+      const regionTotal = regionSpots.length;
+      let regionAcquired = 0;
+      regionSpots.forEach(spot => {
+        const s = getSpotStatus(spot.pokefuta_id);
+        if (s === "acquired" || s === "received") regionAcquired++;
+      });
+      const regionRate = regionTotal > 0 ? ((regionAcquired / regionTotal) * 100).toFixed(1) : "0.0";
+
+      if (summaryEl) {
+        summaryEl.textContent = `${region.name}全体：${regionAcquired} / ${regionTotal} 個 (${regionRate}%)`;
+      }
+
+      container.innerHTML = "";
+
+      // 都道府県一覧（REGIONSのprefectures配列順 = 北から南の自然な順序）
+      region.prefectures.forEach(prefName => {
+        const prefSpots = allSpots.filter(spot => spot.prefecture === prefName);
+        const total = prefSpots.length;
+
+        let countAcquiredOwn = 0;
+        let countReceived = 0;
+
+        prefSpots.forEach(spot => {
+          const s = getSpotStatus(spot.pokefuta_id);
+          if (s === "acquired") countAcquiredOwn++;
+          else if (s === "received") countReceived++;
+        });
+
+        const totalAcquired = countAcquiredOwn + countReceived;
+        const rate = total > 0 ? ((totalAcquired / total) * 100).toFixed(1) : "0.0";
+
+        // 文字によるステータスバッジ
+        let badgeClass = "unacquired";
+        let badgeText = "未所持";
+        if (total === 0) {
+          badgeClass = "none";
+          badgeText = "設置なし";
+        } else if (totalAcquired === total) {
+          badgeClass = "completed";
+          badgeText = "コンプリート";
+        } else if (totalAcquired > 0) {
+          badgeClass = "in-progress";
+          badgeText = "収集中";
+        }
+
+        const card = document.createElement("div");
+        card.className = "pref-card";
+        card.innerHTML = `
+          <div class="pref-card-header">
+            <span class="pref-name">${escapeHtml(prefName)}</span>
+            <span class="pref-status-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="pref-card-body">
+            <div class="pref-stat-main-row">
+              <span class="pref-stat-main-label">取得状況</span>
+              <div>
+                <span class="pref-stat-main-value">${totalAcquired} / ${total} 個</span>
+                <span class="pref-stat-percent-text">(${rate}%)</span>
+              </div>
+            </div>
+            <div class="pref-stat-sub-row">
+              <span>自分で取得: ${countAcquiredOwn} 個</span>
+              <span>もらった: ${countReceived} 個</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
     // ポケふた管理画面を開く
     if (btnOpenManagement && managementView) {
       btnOpenManagement.addEventListener("click", () => {
-        updateRegionStatistics();
+        switchManagementView("region");
         managementView.style.display = "flex";
       });
     }
 
-    // ポケふた管理画面からメイン画面に戻る
+    // ポケふた管理ヘッダーの「戻る」ボタン
     if (btnBackToMain && managementView) {
       btnBackToMain.addEventListener("click", () => {
-        managementView.style.display = "none";
+        if (currentManagementMode === "prefecture") {
+          // 都道府県一覧画面からは地方選択画面に戻る
+          switchManagementView("region");
+        } else {
+          // 地方選択画面からはメイン地図画面に戻る
+          managementView.style.display = "none";
+        }
       });
     }
 
-    // 各地方ボタンの選択処理（次のステップで都道府県別の取得状況画面につなげられる構造）
+    // 都道府県一覧ビュー内の「地方一覧に戻る」ボタン
+    if (btnBackToRegions) {
+      btnBackToRegions.addEventListener("click", () => {
+        switchManagementView("region");
+      });
+    }
+
+    // 各地方ボタンの選択処理
     document.querySelectorAll(".region-card").forEach(card => {
       card.addEventListener("click", () => {
         const regionId = card.dataset.region;
@@ -3382,11 +3679,10 @@
 
     /**
      * 地方選択ハンドラ
-     * 次のステップで都道府県別の取得状況画面へ遷移する処理をつなぐ
+     * 該当地方の都道府県別取得状況画面へ切り替える
      */
     function onSelectRegion(regionId, regionName) {
-      console.log("地方が選択されました:", regionId, regionName);
-      // 次のステップ（都道府県別取得状況画面）をここに連携
+      switchManagementView("prefecture", regionId);
     }
 
     // フレンドモーダルを開く（常にフレンド一覧を初期表示）
