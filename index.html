@@ -668,6 +668,24 @@
       display: flex;
     }
 
+    .desktop-friend-select-wrapper.is-dropup .custom-friend-dropdown {
+      top: auto;
+      bottom: calc(100% + 4px);
+      box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.15), 0 -8px 10px -6px rgba(0, 0, 0, 0.1);
+      animation: friendDropupOpen 0.15s ease-out;
+    }
+
+    @keyframes friendDropupOpen {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .custom-friend-search-box {
       display: flex;
       align-items: center;
@@ -692,14 +710,15 @@
       color: var(--text-main);
     }
 
-    /* フレンド一覧リスト：常時視認しやすいスクロールバー（サイドバー）を表示 */
+    /* フレンド一覧リスト：常時視認しやすいスクロールバー（サイドバー）を表示（5名程度スクロールなしで表示可能） */
     .custom-friend-list {
-      max-height: 185px;
+      max-height: 255px;
       overflow-y: scroll; /* 常時スクロールバーを表示して全員確認可能に */
       overscroll-behavior: contain;
       background: #FFFFFF;
       scrollbar-width: thin;
       scrollbar-color: #94A3B8 #F1F5F9;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* WebKit（Chrome, Edge, Safari等）用サイドバースクロールバー */
@@ -1359,11 +1378,11 @@
       }
 
       .mobile-friend-select {
-        display: block !important;
+        display: none !important;
       }
 
       .desktop-friend-select-wrapper {
-        display: none !important;
+        display: block !important;
       }
 
       .city-search-result-list {
@@ -3055,16 +3074,62 @@
         const emptyEl = wrapperEl.querySelector(`#custom-friend-empty-${spot.pokefuta_id}`);
         const items = listEl.querySelectorAll(".custom-friend-item");
 
+        const adjustDropdownPosition = () => {
+          const triggerRect = triggerBtn.getBoundingClientRect();
+          const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+          const margin = 10;
+          const defaultListMaxHeight = 255;
+          const searchBoxEl = wrapperEl.querySelector(".custom-friend-search-box");
+          const searchBoxH = searchBoxEl ? searchBoxEl.offsetHeight : 36;
+          const targetTotalH = defaultListMaxHeight + searchBoxH + 4;
+
+          const spaceBelow = vh - triggerRect.bottom - margin;
+          const headerEl = document.querySelector("header");
+          const headerBottom = headerEl ? headerEl.getBoundingClientRect().bottom : 0;
+          const spaceAbove = triggerRect.top - Math.max(margin, headerBottom + 6);
+
+          let isDropup = false;
+          if (spaceBelow < targetTotalH && spaceAbove > spaceBelow) {
+            isDropup = true;
+          }
+
+          if (isDropup) {
+            wrapperEl.classList.add("is-dropup");
+            const availableListH = Math.max(130, Math.floor(spaceAbove - searchBoxH - 8));
+            listEl.style.maxHeight = `${Math.min(defaultListMaxHeight, availableListH)}px`;
+          } else {
+            wrapperEl.classList.remove("is-dropup");
+            if (spaceBelow < targetTotalH) {
+              const overflow = targetTotalH - spaceBelow;
+              if (typeof map !== "undefined" && map && targetTotalH <= vh - 60) {
+                map.panBy([0, overflow + 12], { animate: true, duration: 0.25 });
+                listEl.style.maxHeight = `${defaultListMaxHeight}px`;
+              } else {
+                const availableListH = Math.max(130, Math.floor(spaceBelow - searchBoxH - 8));
+                listEl.style.maxHeight = `${availableListH}px`;
+              }
+            } else {
+              listEl.style.maxHeight = `${defaultListMaxHeight}px`;
+            }
+          }
+        };
+
         const toggleDropdown = (open) => {
           const isOpen = open !== undefined ? open : !wrapperEl.classList.contains("is-open");
           if (isOpen) {
+            adjustDropdownPosition();
             wrapperEl.classList.add("is-open");
             triggerBtn.setAttribute("aria-expanded", "true");
             searchInput.value = "";
             filterItems("");
-            setTimeout(() => searchInput.focus(), 60);
+            setTimeout(() => {
+              adjustDropdownPosition();
+              searchInput.focus();
+            }, 60);
           } else {
             wrapperEl.classList.remove("is-open");
+            wrapperEl.classList.remove("is-dropup");
+            listEl.style.maxHeight = "";
             triggerBtn.setAttribute("aria-expanded", "false");
           }
         };
@@ -3131,6 +3196,26 @@
           }
         };
         document.addEventListener("click", onDocClick);
+
+        const handleViewportChange = () => {
+          if (wrapperEl.classList.contains("is-open")) {
+            adjustDropdownPosition();
+          }
+        };
+        window.addEventListener("resize", handleViewportChange);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", handleViewportChange);
+        }
+
+        if (typeof map !== "undefined" && map) {
+          map.once("popupclose", () => {
+            window.removeEventListener("resize", handleViewportChange);
+            if (window.visualViewport) {
+              window.visualViewport.removeEventListener("resize", handleViewportChange);
+            }
+            document.removeEventListener("click", onDocClick);
+          });
+        }
 
         searchInput.addEventListener("keydown", (e) => {
           if (e.key === "Escape") {
