@@ -4047,7 +4047,7 @@
                 <li class="detail-item-row">
                   <div class="detail-item-main">
                     <div class="detail-item-name">No.${escapeHtml(fs.spot_id)} ${escapeHtml(sInfo.prefecture)} ${escapeHtml(sInfo.city)}</div>
-                    <div class="detail-item-sub">${escapeHtml(sInfo.name)}${loc ? ` (${escapeHtml(loc)})` : ""}</div>
+                    <div class="detail-item-sub">${escapeHtml(sInfo.name)}${loc ? ` (${escapeHtml(loc)})` : ""}${fs.sent_by_me ? ` <span style="font-size: 0.7rem; font-weight: 700; color: #EA580C; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 999px; padding: 1px 6px; margin-left: 4px;">自分が送った</span>` : ""}</div>
                   </div>
                   <button type="button" class="btn btn-secondary btn-sm btn-remove-friend-spot" data-fs-id="${fs.id}" style="padding: 3px 8px; font-size: 0.75rem; color: #EF4444; border-color: #FECACA; background: #FEF2F2;" title="解除">
                     解除
@@ -4114,6 +4114,10 @@
                   <option value="">先に都道府県を選択</option>
                 </select>
               </div>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-main); cursor: pointer; padding: 4px 0;">
+                <input type="checkbox" id="detail-add-sent-by-me" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary);">
+                自分が送った
+              </label>
               <button type="button" class="btn btn-primary" id="btn-submit-add-friend-spot" style="width: 100%; font-size: 0.82rem; padding: 7px;" disabled>
                 持っているポケふたに追加
               </button>
@@ -4178,12 +4182,14 @@
       });
 
       // 追加ボタンイベント
+      const sentByMeCheckbox = friendDetailContent.querySelector("#detail-add-sent-by-me");
       addSubmitBtn.addEventListener("click", async () => {
         const spotId = spotSelect.value;
         if (!spotId) return;
+        const sentByMe = sentByMeCheckbox ? sentByMeCheckbox.checked : false;
         addSubmitBtn.disabled = true;
         addSubmitBtn.textContent = "追加中...";
-        await addFriendSpot(friend.id, spotId);
+        await addFriendSpot(friend.id, spotId, sentByMe);
       });
 
       // フレンド削除ボタンイベント
@@ -4194,13 +4200,15 @@
     }
 
     // フレンドが持っているポケふたを追加
-    async function addFriendSpot(friendId, spotId) {
+    async function addFriendSpot(friendId, spotId, sentByMe) {
       if (!friendId || !spotId) return;
 
       if (friendSpots.some(s => s.friend_id === friendId && String(s.spot_id) === String(spotId))) {
         alert("このポケふたはすでに登録されています。");
         return;
       }
+
+      const sentByMeVal = sentByMe === true;
 
       if (isSupabaseConfigured && supabaseClient && currentUser) {
         try {
@@ -4209,7 +4217,8 @@
             .insert([{
               user_id: currentUser.id,
               friend_id: friendId,
-              spot_id: String(spotId)
+              spot_id: String(spotId),
+              sent_by_me: sentByMeVal
             }])
             .select();
 
@@ -4233,6 +4242,7 @@
           id: "fs_" + Date.now(),
           friend_id: friendId,
           spot_id: String(spotId),
+          sent_by_me: sentByMeVal,
           created_at: new Date().toISOString()
         });
       }
